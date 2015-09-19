@@ -41,6 +41,7 @@ var Bitly = {
   updateTitle: function (shortLink, title, callback) {
     var params = {
       access_token: accessToken,
+      edit: "title",
       link: shortLink,
       title: title
     };

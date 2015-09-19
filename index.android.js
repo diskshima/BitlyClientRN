@@ -19,14 +19,25 @@ var {
 var LinkAndroid = require('LinkAndroid');
 var Bitly = require('./bitly');
 
+var Mode = {
+  Loading: 0,
+  List: 1,
+  Edit: 2,
+};
+
 var BitlyClient = React.createClass({
   getInitialState: function () {
     return {
+      mode: Mode.Loading,
       dataSource: new ListView.DataSource({
         rowHasChanged: (row1, row2) => row1 !== row2,
       }),
-      loaded: false,
       newUrl: "",
+      editLink: {
+        link: "",
+        title: "",
+        long_url: "",
+      },
     };
   },
   componentDidMount: function () {
@@ -37,7 +48,7 @@ var BitlyClient = React.createClass({
     Bitly.getMyLinks( (responseData) => {
         this.setState({
           dataSource: this.state.dataSource.cloneWithRows(responseData.data.link_history),
-          loaded: true,
+          mode: Mode.List,
         });
       }
     );
@@ -45,35 +56,60 @@ var BitlyClient = React.createClass({
   fetchDummyData: function () {
     this.setState({
       dataSource: this.state.dataSource.cloneWithRows(Bitly.getDummyList().data.link_history),
-      loaded: true,
+      mode: Mode.List,
     });
   },
   render: function() {
-    if (!this.state.loaded) {
+    var currentMode = this.state.mode;
+    if (currentMode === Mode.Loading) {
       return this.renderLoadingView();
-    }
-
-    return (
-      <View style={styles.list}>
-        <View style={styles.add_url_box}>
-          <TextInput
-            style={{height: 40, borderColor: 'gray', borderWidth: 1}}
-            onChangeText={(text) => this.setState({ newUrl: text })}
-            value={this.state.newUrl}
+    } else if (currentMode === Mode.List) {
+      return (
+        <View style={styles.list}>
+          <View style={styles.add_url_box}>
+            <TextInput
+              style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+              onChangeText={(text) => this.setState({ newUrl: text })}
+              value={this.state.newUrl}
+            />
+            <TouchableHighlight
+              style={styles.button}
+              onPress={this._addButtonClicked.bind(this)}>
+              <Text style={styles.add_button_text}>+</Text>
+            </TouchableHighlight>
+          </View>
+          <ListView
+            dataSource={this.state.dataSource}
+            renderRow={this._renderRow}
+            style={styles.listView}
           />
+        </View>
+      );
+    } else if (currentMode === Mode.Edit) {
+      var link = this.state.editLink;
+
+      return (
+        <View style={styles.edit_page}>
+          <Text>{link.link}</Text>
+          <Text>{link.long_url}</Text>
+          <TextInput value={link.title}
+            onChangeText={(text) =>
+              this.setState({
+                editLink: {
+                  link: link.link,
+                  long_url: link.long_url,
+                  title: text,
+                }
+              })
+            } />
           <TouchableHighlight
             style={styles.button}
-            onPress={this._addButtonClicked.bind(this)}>
-            <Text style={styles.add_button_text}>+</Text>
+            onPress={this._updateButtonClicked.bind(this)}>
+            <Text style={styles.add_button_text}>Update</Text>
           </TouchableHighlight>
         </View>
-        <ListView
-          dataSource={this.state.dataSource}
-          renderRow={this._renderRow}
-          style={styles.listView}
-        />
-      </View>
-    );
+      );
+    }
   },
   _renderRow: function (entry: Object, sectionId: number, rowId: number) {
     return (
@@ -96,11 +132,36 @@ var BitlyClient = React.createClass({
   _onLongPressRow: function (entry) {
     var url = entry.link;
     ToastAndroid.show("Editing " + url, ToastAndroid.SHORT);
+    this.setState({
+      mode: Mode.Edit,
+      editLink: entry,
+    });
   },
   _addButtonClicked: function () {
     Bitly.addLink(this.state.newUrl, (response) => {
       var data = response.data;
       ToastAndroid.show("Added " + data.url, ToastAndroid.SHORT);
+    });
+  },
+  _updateButtonClicked: function () {
+    var newEntry = this.state.editLink;
+    Bitly.updateTitle(newEntry.link, newEntry.title, (response) => {
+      var result = response.status_code;
+      if (result === 200) {
+        ToastAndroid.show("Updated title", ToastAndroid.SHORT);
+        this.setState({
+          mode: Mode.List,
+          editLink: {
+            link: "",
+            title: "",
+            long_url: "",
+          },
+        });
+      } else {
+        var errorMessage = "Failed to update with code = " + result +
+          ", message = " + response.status_txt;
+        ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+      }
     });
   },
   renderLoadingView: function () {
@@ -159,7 +220,11 @@ var styles = StyleSheet.create({
   add_button_text: {
     color: '#EA4A0E',
     textAlign: "center",
-  }
+  },
+  edit_page: {
+    flex: 1,
+    alignItems: 'center',
+  },
 });
 
 AppRegistry.registerComponent('BitlyClient', () => BitlyClient);
