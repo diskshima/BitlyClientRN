@@ -17,7 +17,7 @@ var {
 } = React;
 
 var LinkAndroid = require('LinkAndroid');
-var Bitly = require('./bitly.js');
+var Bitly = require('./bitly');
 
 var BitlyClient = React.createClass({
   getInitialState: function () {

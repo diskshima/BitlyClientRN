@@ -5,21 +5,10 @@
  * Distributed under terms of the MIT license.
  */
 
+var Utils = require('./utils')
+
 var BITLY_BASE_URL = "https://api-ssl.bitly.com/v3";
 var accessToken = "YOUR_ACCESS_TOKEN";
-
-function buildUrl(url, parameters){
-  var qs = "";
-  for(var key in parameters) {
-    var value = parameters[key];
-    qs += encodeURIComponent(key) + "=" + encodeURIComponent(value) + "&";
-  }
-  if (qs.length > 0){
-    qs = qs.substring(0, qs.length-1); //chop off last "&"
-    url = url + "?" + qs;
-  }
-  return url;
-}
 
 var Bitly = {
   getMyLinks: function (callback) {
@@ -27,7 +16,7 @@ var Bitly = {
       access_token: accessToken,
     };
 
-    var url = buildUrl(BITLY_BASE_URL + "/user/link_history", params);
+    var url = Utils.buildUrl(BITLY_BASE_URL + "/user/link_history", params);
 
     fetch(url)
       .then((response) => response.json())
@@ -42,7 +31,7 @@ var Bitly = {
       longUrl: url
     };
 
-    var url = buildUrl(BITLY_BASE_URL + "/shorten", params);
+    var url = Utils.buildUrl(BITLY_BASE_URL + "/shorten", params);
 
     fetch(url)
       .then((response) => response.json())
@@ -56,7 +45,7 @@ var Bitly = {
       title: title
     };
 
-    var url = buildUrl(BITLY_BASE_URL + "/user/link_edit", params);
+    var url = Utils.buildUrl(BITLY_BASE_URL + "/user/link_edit", params);
 
     fetch(url)
       .then((response) => response.json())
