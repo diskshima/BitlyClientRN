@@ -14,6 +14,7 @@ var {
   TouchableHighlight,
   ToastAndroid,
   TextInput,
+  AsyncStorage,
 } = React;
 
 var Login = require('./login');
@@ -25,17 +26,17 @@ var Bitly = require('./bitly');
 var bitly = new Bitly();
 
 var Mode = {
-  Loading: 0,
-  List: 1,
-  Edit: 2,
-  Authenticating: 3,
+  Load: 0,
+  Login: 1,
+  List: 2,
+  Edit: 3,
 };
 
 var BitlyClient = React.createClass({
   getInitialState: function () {
     var mode;
     return {
-      mode: Mode.Authenticating,
+      mode: Mode.Load,
       dataSource: new ListView.DataSource({
         rowHasChanged: (row1, row2) => row1 !== row2,
       }),
@@ -46,10 +47,6 @@ var BitlyClient = React.createClass({
         long_url: "",
       },
     };
-  },
-  componentDidMount: function () {
-    // this.fetchData();
-    // this.fetchDummyData();
   },
   fetchData: function () {
     bitly.getMyLinks((responseData) => {
@@ -73,14 +70,24 @@ var BitlyClient = React.createClass({
   render: function() {
     var currentMode = this.state.mode;
 
-    if (currentMode === Mode.Authenticating) {
+    if (currentMode === Mode.Load) {
+      bitly.loadFromStorage((value) => {
+        var mode;
+        if (value) {
+          this.fetchData();
+          mode = Mode.List;
+        } else {
+          mode = Mode.Login;
+        }
+
+        this.setState({ mode: mode });
+      });
+      return this.renderLoadingView();
+    }
+    else if (currentMode === Mode.Login) {
       return (
         <Login bitly={bitly} callback={(response) => this._onLoginCallback(response)} />
       );
-    }
-
-    if (currentMode === Mode.Loading) {
-      return this.renderLoadingView();
     } else if (currentMode === Mode.List) {
       return (
         <View style={styles.list}>

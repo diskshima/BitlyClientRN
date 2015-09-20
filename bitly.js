@@ -5,15 +5,48 @@
  * Distributed under terms of the MIT license.
  */
 
+'use strict';
+
+var React = require('react-native');
+
+var {
+  AsyncStorage,
+} = React;
+
 var Utils = require('./utils')
 
 var BITLY_HOST_URL  = "https://api-ssl.bitly.com";
 var BITLY_API_BASE_URL = BITLY_HOST_URL + "/v3";
+var BITLY_ACCESS_TOKEN_KEY = "bitly_access_token";
 
 var methods = Bitly.prototype;
 
 function Bitly() {
 }
+
+methods.loadFromStorage = function (callback) {
+  AsyncStorage.getItem(BITLY_ACCESS_TOKEN_KEY)
+    .then((value) => {
+      if (value) {
+        this._accessToken = value;
+        callback(this._accessToken);
+        return;
+      }
+
+      callback(null);
+    })
+    .done();
+};
+
+methods.saveAccessToken = function () {
+  AsyncStorage.setItem(BITLY_ACCESS_TOKEN_KEY, this._accessToken)
+    .then((error) => {
+      if (error) {
+        console.error("Failed to save access token with: " + error);
+      }
+    })
+    .done();
+};
 
 methods.authenticate = function (username, password, callback) {
   var that = this;
@@ -45,6 +78,7 @@ methods.authenticate = function (username, password, callback) {
       // TODO Handle login failure
       console.info("Login response: " + response);
       that._accessToken = response.access_token;
+      that.saveAccessToken();
     })
     .then((response) => callback(response))
     .done();
