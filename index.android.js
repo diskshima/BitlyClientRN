@@ -16,19 +16,26 @@ var {
   TextInput,
 } = React;
 
+var Login = require('./login');
+
 var LinkAndroid = require('LinkAndroid');
+
 var Bitly = require('./bitly');
+
+var bitly = new Bitly();
 
 var Mode = {
   Loading: 0,
   List: 1,
   Edit: 2,
+  Authenticating: 3,
 };
 
 var BitlyClient = React.createClass({
   getInitialState: function () {
+    var mode;
     return {
-      mode: Mode.Loading,
+      mode: Mode.Authenticating,
       dataSource: new ListView.DataSource({
         rowHasChanged: (row1, row2) => row1 !== row2,
       }),
@@ -41,11 +48,11 @@ var BitlyClient = React.createClass({
     };
   },
   componentDidMount: function () {
-    this.fetchData();
+    // this.fetchData();
     // this.fetchDummyData();
   },
   fetchData: function () {
-    Bitly.getMyLinks( (responseData) => {
+    bitly.getMyLinks((responseData) => {
         this.setState({
           dataSource: this.state.dataSource.cloneWithRows(responseData.data.link_history),
           mode: Mode.List,
@@ -55,12 +62,23 @@ var BitlyClient = React.createClass({
   },
   fetchDummyData: function () {
     this.setState({
-      dataSource: this.state.dataSource.cloneWithRows(Bitly.getDummyList().data.link_history),
+      dataSource: this.state.dataSource.cloneWithRows(bitly.getDummyList().data.link_history),
       mode: Mode.List,
     });
   },
+  _onLoginCallback: function (response) {
+    ToastAndroid.show("Successfully logged in.", ToastAndroid.SHORT);
+    this.fetchData();
+  },
   render: function() {
     var currentMode = this.state.mode;
+
+    if (currentMode === Mode.Authenticating) {
+      return (
+        <Login bitly={bitly} callback={(response) => this._onLoginCallback(response)} />
+      );
+    }
+
     if (currentMode === Mode.Loading) {
       return this.renderLoadingView();
     } else if (currentMode === Mode.List) {
@@ -138,14 +156,14 @@ var BitlyClient = React.createClass({
     });
   },
   _addButtonClicked: function () {
-    Bitly.addLink(this.state.newUrl, (response) => {
+    bitly.addLink(this.state.newUrl, (response) => {
       var data = response.data;
       ToastAndroid.show("Added " + data.url, ToastAndroid.SHORT);
     });
   },
   _updateButtonClicked: function () {
     var newEntry = this.state.editLink;
-    Bitly.updateTitle(newEntry.link, newEntry.title, (response) => {
+    bitly.updateTitle(newEntry.link, newEntry.title, (response) => {
       var result = response.status_code;
       if (result === 200) {
         ToastAndroid.show("Updated title", ToastAndroid.SHORT);

@@ -2,6 +2,7 @@
 
 TODO
 ---
-- [x] Edit existing
-- [ ] Ability to archive
-- [ ] OAuth support
+[x] Edit existing
+[x] OAuth support
+[ ] Save access token
+[ ] Ability to archive

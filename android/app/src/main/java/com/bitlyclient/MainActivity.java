@@ -14,6 +14,7 @@ import com.facebook.soloader.SoLoader;
 import com.diskshima.LinkPackage;
 
 public class MainActivity extends Activity implements DefaultHardwareBackBtnHandler {
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     private ReactInstanceManager mReactInstanceManager;
     private ReactRootView mReactRootView;
