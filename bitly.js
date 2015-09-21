@@ -119,6 +119,21 @@ methods.updateTitle = function (shortLink, title, callback) {
     title: title
   };
 
+  this.sendLinkEdit(params, callback);
+};
+
+methods.archiveLink = function (shortLink, callback) {
+  var params = {
+    access_token: this._accessToken,
+    edit: "archived",
+    link: shortLink,
+    archived: true,
+  };
+
+  this.sendLinkEdit(params, callback);
+};
+
+methods.sendLinkEdit = function (params, callback) {
   var url = Utils.buildUrl(BITLY_API_BASE_URL + "/user/link_edit", params);
 
   fetch(url)

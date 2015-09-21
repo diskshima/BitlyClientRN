@@ -15,11 +15,13 @@ var {
   ToastAndroid,
   TextInput,
   AsyncStorage,
+  Navigator,
+  BackAndroid
 } = React;
 
-var Login = require('./login');
-
 var LinkAndroid = require('LinkAndroid');
+
+var Login = require('./login');
 
 var Bitly = require('./bitly');
 
@@ -34,9 +36,7 @@ var Mode = {
 
 var BitlyClient = React.createClass({
   getInitialState: function () {
-    var mode;
     return {
-      mode: Mode.Load,
       dataSource: new ListView.DataSource({
         rowHasChanged: (row1, row2) => row1 !== row2,
       }),
@@ -48,14 +48,15 @@ var BitlyClient = React.createClass({
       },
     };
   },
-  fetchData: function () {
+  fetchData: function (navigator) {
     bitly.getMyLinks((responseData) => {
-        this.setState({
-          dataSource: this.state.dataSource.cloneWithRows(responseData.data.link_history),
-          mode: Mode.List,
-        });
-      }
-    );
+      this.setState({
+        dataSource: this.state.dataSource.cloneWithRows(responseData.data.link_history),
+      });
+      navigator.replace({
+        mode: Mode.List,
+      });
+    });
   },
   fetchDummyData: function () {
     this.setState({
@@ -63,90 +64,111 @@ var BitlyClient = React.createClass({
       mode: Mode.List,
     });
   },
-  _onLoginCallback: function (response) {
+  _onLoginCallback: function (response, navigator) {
     ToastAndroid.show("Successfully logged in.", ToastAndroid.SHORT);
-    this.fetchData();
+    this.fetchData(navigator);
   },
   render: function() {
-    var currentMode = this.state.mode;
+    return (
+      <Navigator
+        initialRoute={{mode: Mode.Load}}
+        renderScene={(route, navigator) => {
+          var currentMode = route.mode;
 
-    if (currentMode === Mode.Load) {
-      bitly.loadFromStorage((value) => {
-        var mode;
-        if (value) {
-          this.fetchData();
-          mode = Mode.List;
-        } else {
-          mode = Mode.Login;
+          switch (currentMode) {
+            case Mode.Load:
+              return this.renderLoadingView(navigator);
+            case Mode.Login:
+              return (
+                <Login bitly={bitly} callback={(response) => this._onLoginCallback(response, navigator)} />
+              );
+            case Mode.List:
+              return this.renderList(navigator);
+            case Mode.Edit:
+              var link = route.editLink;
+              return this.renderEdit(link, navigator);
+            }
+          }
         }
-
-        this.setState({ mode: mode });
-      });
-      return this.renderLoadingView();
-    }
-    else if (currentMode === Mode.Login) {
-      return (
-        <Login bitly={bitly} callback={(response) => this._onLoginCallback(response)} />
-      );
-    } else if (currentMode === Mode.List) {
-      return (
-        <View style={styles.list}>
-          <View style={styles.add_url_box}>
-            <TextInput
-              style={{height: 40, borderColor: 'gray', borderWidth: 1}}
-              onChangeText={(text) => this.setState({ newUrl: text })}
-              value={this.state.newUrl}
-            />
-            <TouchableHighlight
-              style={styles.button}
-              onPress={this._addButtonClicked.bind(this)}>
-              <Text style={styles.add_button_text}>+</Text>
-            </TouchableHighlight>
-          </View>
-          <ListView
-            dataSource={this.state.dataSource}
-            renderRow={this._renderRow}
-            style={styles.listView}
+        />
+    );
+  },
+  renderList: function (navigator) {
+    return (
+      <View style={styles.list}>
+        <View style={styles.add_url_box}>
+          <TextInput
+            style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+            onChangeText={(text) => this.setState({ newUrl: text })}
+            value={this.state.newUrl}
           />
-        </View>
-      );
-    } else if (currentMode === Mode.Edit) {
-      var link = this.state.editLink;
-
-      return (
-        <View style={styles.edit_page}>
-          <Text>{link.link}</Text>
-          <Text>{link.long_url}</Text>
-          <TextInput value={link.title}
-            onChangeText={(text) =>
-              this.setState({
-                editLink: {
-                  link: link.link,
-                  long_url: link.long_url,
-                  title: text,
-                }
-              })
-            } />
           <TouchableHighlight
             style={styles.button}
-            onPress={this._updateButtonClicked.bind(this)}>
-            <Text style={styles.add_button_text}>Update</Text>
+            onPress={this._addButtonClicked}>
+            <Text style={styles.button_text}>+</Text>
           </TouchableHighlight>
         </View>
-      );
-    }
+        <ListView
+          dataSource={this.state.dataSource}
+          renderRow={
+            (entry: Object, sectionId: number, rowId: number) => {
+              return (
+                <TouchableHighlight
+                  onPress={() => this._onPressRow(entry)}
+                  onLongPress={() => this._onLongPressRow(entry, navigator)}
+                  style={styles.row}>
+                  <View style={styles.rowInside}>
+                    <Text style={styles.title}>{entry.title}</Text>
+                    <Text style={styles.short_url}>{entry.link}</Text>
+                    <Text style={styles.long_url}>{entry.long_url}</Text>
+                  </View>
+                </TouchableHighlight>
+              );
+            }
+          }
+          style={styles.listView}
+        />
+      </View>
+    );
   },
-  _renderRow: function (entry: Object, sectionId: number, rowId: number) {
+  _popNavigator: function (navigator) {
+    navigator.pop();
+    return true;
+  },
+  _popAndRemoveListner: function (navigator) {
+    BackAndroid.removeEventListener('hardwareBackPress', this._popNavigator);
+    this._popNavigator(navigator);
+  },
+  renderEdit: function (link, navigator) {
+    BackAndroid.addEventListener('hardwareBackPress', this._popNavigator);
+
+    var showLink = this.state.newEditLink || link;
+
     return (
-      <TouchableHighlight onPress={() => this._onPressRow(entry)}
-        onLongPress={() => this._onLongPressRow(entry)}
-        style={styles.row}>
-        <View style={styles.rowInside}>
-          <Text style={styles.title}>{entry.title}</Text>
-          <Text style={styles.short_url}>{entry.link}</Text>
-          <Text style={styles.long_url}>{entry.long_url}</Text>
-        </View>
-      </TouchableHighlight>
+      <View style={styles.edit_page}>
+        <Text>{showLink.link}</Text>
+        <Text>{showLink.long_url}</Text>
+        <TextInput value={showLink.title}
+          onChangeText={(text) => {
+            this.setState({
+              newEditLink: {
+                link: showLink.link,
+                long_url: showLink.long_url,
+                title: text,
+              },
+            });
+          }} />
+        <TouchableHighlight
+          style={styles.button}
+          onPress={() => this._updateButtonClicked(navigator)}>
+          <Text style={styles.button_text}>Update</Text>
+        </TouchableHighlight>
+        <TouchableHighlight
+          style={styles.button}
+          onPress={() => this._onArchive(showLink.link, navigator)}>
+          <Text style={styles.button_text}>Archive</Text>
+        </TouchableHighlight>
+      </View>
     );
   },
   _onPressRow: function (entry) {
@@ -154,13 +176,20 @@ var BitlyClient = React.createClass({
     ToastAndroid.show("Opening " + url + "...", ToastAndroid.SHORT);
     LinkAndroid.open(url);
   },
-  _onLongPressRow: function (entry) {
+  _onLongPressRow: function (entry, navigator) {
     var url = entry.link;
     ToastAndroid.show("Editing " + url, ToastAndroid.SHORT);
-    this.setState({
+    navigator.push({
+      name: 'Edit Link',
       mode: Mode.Edit,
       editLink: entry,
     });
+  },
+  _onArchive: function (shortLink, navigator) {
+    bitly.archiveLink(shortLink, (response) => {
+      ToastAndroid.show("Archived " + response.data.link_edit.link, ToastAndroid.SHORT);
+    });
+    this._popAndRemoveListner(navigator);
   },
   _addButtonClicked: function () {
     bitly.addLink(this.state.newUrl, (response) => {
@@ -168,28 +197,34 @@ var BitlyClient = React.createClass({
       ToastAndroid.show("Added " + data.url, ToastAndroid.SHORT);
     });
   },
-  _updateButtonClicked: function () {
-    var newEntry = this.state.editLink;
+  _updateButtonClicked: function (navigator) {
+    var newEntry = this.state.newEditLink;
+
+    if (!newEntry) {
+      this._popAndRemoveListner(navigator);
+      return;
+    }
+
     bitly.updateTitle(newEntry.link, newEntry.title, (response) => {
       var result = response.status_code;
       if (result === 200) {
         ToastAndroid.show("Updated title", ToastAndroid.SHORT);
-        this.setState({
-          mode: Mode.List,
-          editLink: {
-            link: "",
-            title: "",
-            long_url: "",
-          },
-        });
       } else {
         var errorMessage = "Failed to update with code = " + result +
           ", message = " + response.status_txt;
         ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
       }
+      this._popAndRemoveListner(navigator);
     });
   },
-  renderLoadingView: function () {
+  renderLoadingView: function (navigator) {
+    bitly.loadFromStorage((value) => {
+      var name;
+      var mode;
+      if (value) {
+        this.fetchData(navigator);
+      }
+    });
     return (
       <View style={styles.loading}>
         <Text>Loading links...</Text>
@@ -242,7 +277,7 @@ var styles = StyleSheet.create({
     backgroundColor: "#E2F5FD",
     width: 50,
   },
-  add_button_text: {
+  button_text: {
     color: '#EA4A0E',
     textAlign: "center",
   },
