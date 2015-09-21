@@ -34,6 +34,8 @@ var Mode = {
   Edit: 3,
 };
 
+var BackButtonEventListenerSet = false;
+
 var BitlyClient = React.createClass({
   getInitialState: function () {
     return {
@@ -41,11 +43,6 @@ var BitlyClient = React.createClass({
         rowHasChanged: (row1, row2) => row1 !== row2,
       }),
       newUrl: "",
-      editLink: {
-        link: "",
-        title: "",
-        long_url: "",
-      },
     };
   },
   fetchData: function (navigator) {
@@ -74,6 +71,19 @@ var BitlyClient = React.createClass({
         initialRoute={{mode: Mode.Load}}
         renderScene={(route, navigator) => {
           var currentMode = route.mode;
+
+          if (!BackButtonEventListenerSet) {
+            BackAndroid.addEventListener('hardwareBackPress', () => {
+              var routes = navigator.getCurrentRoutes();
+              if (routes[routes.length-1].mode === Mode.Edit) {
+                navigator.pop();
+                return true;
+              } else {
+                return false;
+              }
+            });
+            BackButtonEventListenerSet = true;
+          }
 
           switch (currentMode) {
             case Mode.Load:
@@ -131,16 +141,7 @@ var BitlyClient = React.createClass({
       </View>
     );
   },
-  _popNavigator: function (navigator) {
-    navigator.pop();
-    return true;
-  },
-  _popAndRemoveListner: function (navigator) {
-    BackAndroid.removeEventListener('hardwareBackPress', this._popNavigator);
-    this._popNavigator(navigator);
-  },
   renderEdit: function (link, navigator) {
-    BackAndroid.addEventListener('hardwareBackPress', this._popNavigator);
 
     var showLink = this.state.newEditLink || link;
 
@@ -189,7 +190,7 @@ var BitlyClient = React.createClass({
     bitly.archiveLink(shortLink, (response) => {
       ToastAndroid.show("Archived " + response.data.link_edit.link, ToastAndroid.SHORT);
     });
-    this._popAndRemoveListner(navigator);
+    navigator.pop();
   },
   _addButtonClicked: function () {
     bitly.addLink(this.state.newUrl, (response) => {
@@ -201,7 +202,7 @@ var BitlyClient = React.createClass({
     var newEntry = this.state.newEditLink;
 
     if (!newEntry) {
-      this._popAndRemoveListner(navigator);
+      navigator.pop();
       return;
     }
 
@@ -214,7 +215,7 @@ var BitlyClient = React.createClass({
           ", message = " + response.status_txt;
         ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
       }
-      this._popAndRemoveListner(navigator);
+      navigator.pop();
     });
   },
   renderLoadingView: function (navigator) {
@@ -223,6 +224,10 @@ var BitlyClient = React.createClass({
       var mode;
       if (value) {
         this.fetchData(navigator);
+      } else {
+        navigator.replace({
+          mode: Mode.Login,
+        });
       }
     });
     return (
