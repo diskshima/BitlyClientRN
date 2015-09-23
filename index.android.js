@@ -75,7 +75,7 @@ var BitlyClient = React.createClass({
           var currentMode = route.mode;
 
           if (!BackButtonEventListenerSet) {
-            BackAndroid.addEventListener('hardwareBackPress', () => {
+            BackAndroid.addEventListener("hardwareBackPress", () => {
               var routes = navigator.getCurrentRoutes();
               if (routes[routes.length-1].mode === Mode.Edit) {
                 navigator.pop();
@@ -107,10 +107,10 @@ var BitlyClient = React.createClass({
   },
   renderList: function (navigator) {
     return (
-      <View style={styles.list}>
+      <View style={styles.main}>
         <View style={styles.add_url_box}>
           <TextInput
-            style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+            style={styles.input_field}
             onChangeText={(text) => this.setState({ newUrl: text })}
             value={this.state.newUrl}
           />
@@ -121,6 +121,7 @@ var BitlyClient = React.createClass({
           </TouchableHighlight>
         </View>
         <ListView
+          style={styles.list_view}
           dataSource={this.state.dataSource}
           renderRow={
             (entry: Object, sectionId: number, rowId: number) => {
@@ -138,7 +139,6 @@ var BitlyClient = React.createClass({
               );
             }
           }
-          style={styles.listView}
         />
       </View>
     );
@@ -183,7 +183,6 @@ var BitlyClient = React.createClass({
     var url = entry.link;
     ToastAndroid.show("Editing " + url, ToastAndroid.SHORT);
     navigator.push({
-      name: 'Edit Link',
       mode: Mode.Edit,
       editLink: entry,
     });
@@ -243,14 +242,14 @@ var BitlyClient = React.createClass({
 var styles = StyleSheet.create({
   loading: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   row: {
     flex: 1,
-    justifyContent: 'space-between',
-    backgroundColor: '#F5FCFF',
+    justifyContent: "space-between",
+    backgroundColor: "#F5FCFF",
     borderWidth: 2,
-    borderColor: '#4EA2D8',
+    borderColor: "#4EA2D8",
     margin: 5,
   },
   rowInside: {
@@ -262,36 +261,46 @@ var styles = StyleSheet.create({
     marginBottom: 5,
   },
   short_url: {
-    color: '#EA4A0E',
+    color: "#EA4A0E",
     marginLeft: 5,
     marginBottom: 5,
   },
   long_url: {
     fontSize: 12,
-    color: '#535353',
+    color: "#535353",
     marginBottom: 5,
   },
-  list: {
+  main: {
     flex: 1,
-  },
-  listView: {
-    backgroundColor: "#F5FCFF",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
   },
   add_url_box: {
-    justifyContent: "center",
+  },
+  list_view: {
+    backgroundColor: "#F5FCFF",
+  },
+  input_field: {
+    height: 25,
   },
   button: {
+    flexDirection: "column",
     backgroundColor: "#E2F5FD",
-    width: 50,
+    textAlign: "center",
+    height: 25,
+    width: 55,
+    marginBottom: 5,
   },
   button_text: {
-    color: '#EA4A0E',
+    color: "#EA4A0E",
     textAlign: "center",
+    fontSize: 15,
   },
   edit_page: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
 });
 
-AppRegistry.registerComponent('BitlyClient', () => BitlyClient);
+AppRegistry.registerComponent("BitlyClient", () => BitlyClient);

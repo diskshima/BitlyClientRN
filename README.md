@@ -7,5 +7,6 @@ TODO
 - [x] Save access token
 - [x] Ability to archive
 - [x] Ability to accept sharing
+- [x] Make button larger
 - [ ] Local caching
 - [ ] Error handling
