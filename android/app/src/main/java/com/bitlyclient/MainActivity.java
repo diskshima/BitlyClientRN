@@ -1,6 +1,7 @@
 package com.bitlyclient;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 
@@ -15,6 +16,7 @@ import com.diskshima.LinkPackage;
 
 public class MainActivity extends Activity implements DefaultHardwareBackBtnHandler {
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String SHARED_URL_KEY = "sharedUrl";
 
     private ReactInstanceManager mReactInstanceManager;
     private ReactRootView mReactRootView;
@@ -34,7 +36,14 @@ public class MainActivity extends Activity implements DefaultHardwareBackBtnHand
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();
 
-        mReactRootView.startReactApplication(mReactInstanceManager, "BitlyClient", null);
+        final Bundle bundle = new Bundle();
+        final String sharedUrl = getSharedText();
+
+        if (sharedUrl != null) {
+            bundle.putCharSequence(SHARED_URL_KEY, sharedUrl);
+        }
+
+        mReactRootView.startReactApplication(mReactInstanceManager, "BitlyClient", bundle);
 
         setContentView(mReactRootView);
     }
@@ -78,5 +87,20 @@ public class MainActivity extends Activity implements DefaultHardwareBackBtnHand
         } else {
             super.onBackPressed();
         }
+    }
+
+    private String getSharedText() {
+        final Intent intent = getIntent();
+        final String action = intent.getAction();
+        final String type = intent.getType();
+
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            if ("text/plain".equals(type)) {
+                final String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+                return sharedText;
+            }
+        }
+
+        return null;
     }
 }

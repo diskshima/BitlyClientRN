@@ -38,11 +38,13 @@ var BackButtonEventListenerSet = false;
 
 var BitlyClient = React.createClass({
   getInitialState: function () {
+    var sharedUrl = this.props.sharedUrl || "";
+
     return {
       dataSource: new ListView.DataSource({
         rowHasChanged: (row1, row2) => row1 !== row2,
       }),
-      newUrl: "",
+      newUrl: sharedUrl,
     };
   },
   fetchData: function (navigator) {

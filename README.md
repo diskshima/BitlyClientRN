@@ -6,6 +6,6 @@ TODO
 - [x] OAuth support
 - [x] Save access token
 - [x] Ability to archive
-- [ ] Ability to accept sharing
+- [x] Ability to accept sharing
 - [ ] Local caching
 - [ ] Error handling
