@@ -130,7 +130,7 @@ var BitlyClient = React.createClass({
                   onPress={() => this._onPressRow(entry)}
                   onLongPress={() => this._onLongPressRow(entry, navigator)}
                   style={styles.row}
-                  underlayColor="#CC4400">
+                  underlayColor="#AAAAAA">
                   <View style={styles.rowInside}>
                     <Text style={styles.title}>{entry.title}</Text>
                     <Text style={styles.short_url}>{entry.link}</Text>
