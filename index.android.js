@@ -116,7 +116,7 @@ var BitlyClient = React.createClass({
           />
           <TouchableHighlight
             style={styles.button}
-            onPress={this._addButtonClicked}>
+            onPress={() => this._addButtonClicked(navigator)}>
             <Text style={styles.button_text}>+</Text>
           </TouchableHighlight>
         </View>
@@ -191,14 +191,27 @@ var BitlyClient = React.createClass({
   _onArchive: function (shortLink, navigator) {
     bitly.archiveLink(shortLink, (response) => {
       ToastAndroid.show("Archived " + response.data.link_edit.link, ToastAndroid.SHORT);
+      this._refreshList(navigator);
     });
     navigator.pop();
   },
-  _addButtonClicked: function () {
-    bitly.addLink(this.state.newUrl, (response) => {
-      var data = response.data;
-      ToastAndroid.show("Added " + data.url, ToastAndroid.SHORT);
+  _refreshList: function (navigator) {
+    navigator.replace({
+      mode: Mode.Load,
     });
+  },
+  _addButtonClicked: function (navigator) {
+    bitly.addLink(this.state.newUrl,
+      (data) => {
+        ToastAndroid.show("Added " + data.url, ToastAndroid.SHORT);
+        this._refreshList(navigator);
+      },
+      (response) => {
+        var message = response.status_txt;
+        console.error("Failed with " + response.status_code + ": " + message);
+        ToastAndroid.show("Error: " + message, ToastAndroid.SHORT);
+      }
+    );
   },
   _updateButtonClicked: function (navigator) {
     var newEntry = this.state.newEditLink;

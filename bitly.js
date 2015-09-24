@@ -97,7 +97,7 @@ methods.getMyLinks = function (callback) {
   return;
 };
 
-methods.addLink = function (url, callback) {
+methods.addLink = function (url, onSuccess, onFail) {
   var params = {
     access_token: this._accessToken,
     longUrl: url
@@ -107,7 +107,14 @@ methods.addLink = function (url, callback) {
 
   fetch(url)
     .then((response) => response.json())
-    .then(callback)
+    .then((response) => {
+      var code = response.status_code;
+      if (code === 200) {
+        onSuccess(response.data);
+      } else {
+        onFail(response);
+      }
+    })
     .done();
 };
 

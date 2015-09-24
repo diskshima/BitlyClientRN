@@ -8,5 +8,8 @@ TODO
 - [x] Ability to archive
 - [x] Ability to accept sharing
 - [x] Make button larger
-- [ ] Local caching
+- [x] Refresh on add and archive
+- [ ] Automatically add http to URLs
+- [ ] Add refresh button
 - [ ] Error handling
+- [ ] Local caching
