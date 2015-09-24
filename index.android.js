@@ -129,7 +129,8 @@ var BitlyClient = React.createClass({
                 <TouchableHighlight
                   onPress={() => this._onPressRow(entry)}
                   onLongPress={() => this._onLongPressRow(entry, navigator)}
-                  style={styles.row}>
+                  style={styles.row}
+                  underlayColor="#CC4400">
                   <View style={styles.rowInside}>
                     <Text style={styles.title}>{entry.title}</Text>
                     <Text style={styles.short_url}>{entry.link}</Text>
@@ -257,7 +258,6 @@ var styles = StyleSheet.create({
   },
   title: {
     fontSize: 15,
-    height: 35,
     marginBottom: 5,
   },
   short_url: {
@@ -273,29 +273,25 @@ var styles = StyleSheet.create({
   main: {
     flex: 1,
     flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
   },
   add_url_box: {
   },
   list_view: {
+    flexDirection: "column",
     backgroundColor: "#F5FCFF",
   },
   input_field: {
-    height: 25,
   },
   button: {
-    flexDirection: "column",
     backgroundColor: "#E2F5FD",
-    textAlign: "center",
-    height: 25,
-    width: 55,
+    width: 70,
     marginBottom: 5,
   },
   button_text: {
     color: "#EA4A0E",
     textAlign: "center",
-    fontSize: 15,
+    alignItems: "stretch",
+    fontSize: 18,
   },
   edit_page: {
     flex: 1,
