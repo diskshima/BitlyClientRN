@@ -14,7 +14,7 @@ TODO
 - [x] Add logout menu (inside drawer)
 - [x] Add text to login screen
 - [x] Error handling
-- [ ] Separate screen for URL addition
+- [x] Separate screen for URL addition
 - [ ] Add support for archived links
 - [ ] Support for unarchiving
 - [ ] Local caching

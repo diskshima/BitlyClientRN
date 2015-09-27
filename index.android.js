@@ -33,19 +33,22 @@ var Mode = {
   Login: 1,
   List: 2,
   Edit: 3,
+  Add: 4,
 };
 
 var BackButtonEventListenerSet = false;
 
 var BitlyClient = React.createClass({
   getInitialState: function () {
-    var sharedUrl = this.props.sharedUrl || "";
+    var sharedUrl = this.props.sharedUrl;
+    var mode = sharedUrl ? Mode.Add : Mode.Load;
 
     return {
       dataSource: new ListView.DataSource({
         rowHasChanged: (row1, row2) => row1 !== row2,
       }),
       newUrl: sharedUrl,
+      initialMode: mode,
     };
   },
   fetchData: function (navigator) {
@@ -83,7 +86,7 @@ var BitlyClient = React.createClass({
   render: function() {
     return (
       <Navigator
-        initialRoute={{mode: Mode.Load}}
+        initialRoute={{mode: this.state.initialMode}}
         renderScene={this._renderScene}
         />
     );
@@ -117,15 +120,29 @@ var BitlyClient = React.createClass({
       case Mode.Edit:
         var link = route.editLink;
         return this.renderEdit(link, navigator);
+      case Mode.Add:
+        return this._renderAdd(navigator);
     }
+  },
+  _onShortenClicked: function (navigator) {
+    navigator.replace({
+      mode: Mode.Add,
+    });
   },
   renderList: function (navigator) {
     var drawerView = (
-      <TouchableHighlight
-        style={styles.drawer}
-        onPress={() => this._onLogoutClicked(navigator)}>
-        <Text style={styles.drawer_item}>Logout</Text>
-      </TouchableHighlight>
+      <View>
+        <TouchableHighlight
+          style={styles.drawer}
+          onPress={() => this._onShortenClicked(navigator)}>
+          <Text style={styles.drawer_item}>Shorten New Link</Text>
+        </TouchableHighlight>
+        <TouchableHighlight
+          style={styles.drawer}
+          onPress={() => this._onLogoutClicked(navigator)}>
+          <Text style={styles.drawer_item}>Logout</Text>
+        </TouchableHighlight>
+      </View>
     );
 
     return (
@@ -134,24 +151,10 @@ var BitlyClient = React.createClass({
         drawerPosition={DrawerLayoutAndroid.positions.Left}
         renderNavigationView={() => drawerView}>
         <View style={styles.main}>
-          <View style={styles.add_url_box}>
-            <Text>New URL to shorten</Text>
-            <TextInput
-              style={styles.input_field}
-              onChangeText={(text) => this.setState({ newUrl: text })}
-              value={this.state.newUrl}
-            />
-            <View style={styles.top_buttons}>
-              <Button
-                style={styles.add_button}
-                onPress={() => this._addButtonClicked(navigator)}
-                text="+" />
-              <Button
-                style={styles.refresh_button}
-                onPress={() => this._refreshList(navigator)}
-                text="Refresh" />
-            </View>
-          </View>
+          <Button
+            style={styles.refresh_button}
+            onPress={() => this._refreshList(navigator)}
+            text="Refresh" />
           <ListView
             style={styles.list_view}
             dataSource={this.state.dataSource}
@@ -204,6 +207,24 @@ var BitlyClient = React.createClass({
       </View>
     );
   },
+  _renderAdd: function (navigator) {
+    return (
+      <View style={styles.add_url_box}>
+        <Text>New URL to shorten</Text>
+        <TextInput
+          style={styles.input_field}
+          onChangeText={(text) => this.setState({ newUrl: text })}
+          value={this.state.newUrl}
+        />
+        <View style={styles.top_buttons}>
+          <Button
+            style={styles.add_button}
+            onPress={() => this._addButtonClicked(navigator)}
+            text="+" />
+        </View>
+      </View>
+    );
+  },
   _onPressRow: function (entry) {
     var url = entry.link;
     ReactUtils.showToast("Opening " + url + "...");
@@ -231,6 +252,10 @@ var BitlyClient = React.createClass({
     navigator.pop();
   },
   _refreshList: function (navigator) {
+    this.setState({
+      newUrl: '',
+    });
+
     navigator.replace({
       mode: Mode.Load,
     });
@@ -238,20 +263,30 @@ var BitlyClient = React.createClass({
   _addButtonClicked: function (navigator) {
     var url = Utils.addProtocol(this.state.newUrl);
 
-    bitly.addLink(url,
-      (response) => {
-        var data = response.data;
-        var message = response.status_txt;
+    bitly.loadFromStorage((value) => {
+      if (value) {
+        bitly.addLink(url,
+          (response) => {
+            var data = response.data;
+            var message = response.status_txt;
 
-        if (response.status_code === 200) {
-          ReactUtils.showToast("Added " + data.url);
-          this._refreshList(navigator);
-        } else {
-          console.error("Failed with " + response.status_code + ": " + message);
-          ReactUtils.showToast("Error: " + message);
-        }
+            if (response.status_code === 200) {
+              ReactUtils.showToast("Added " + data.url);
+              this._refreshList(navigator, true);
+            } else {
+              console.error("Failed with " + response.status_code + ": " + message);
+              ReactUtils.showToast("Error: " + message);
+            }
+          }
+        );
+      } else {
+        // FIXME This will render to the list eventually. Instead continue
+        //   adding the link
+        navigator.replace({
+          mode: Mode.Login,
+        });
       }
-    );
+    });
   },
   _updateButtonClicked: function (navigator) {
     var newEntry = this.state.newEditLink;
