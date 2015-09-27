@@ -49,10 +49,11 @@ var BitlyClient = React.createClass({
       }),
       newUrl: sharedUrl,
       initialMode: mode,
+      showOnlyArchived: false,
     };
   },
   fetchData: function (navigator) {
-    bitly.getMyLinks((response) => {
+    bitly.getMyLinks(this.state.showOnlyArchived, (response) => {
       if (response.status_code === 200) {
         this.setState({
           dataSource: this.state.dataSource.cloneWithRows(response.data.link_history),
@@ -129,13 +130,27 @@ var BitlyClient = React.createClass({
       mode: Mode.Add,
     });
   },
+  _onArchivedToggle: function (navigator) {
+    this.setState({
+      showOnlyArchived: !this.state.showOnlyArchived,
+    });
+
+    this.renderLoadingView(navigator);
+  },
   renderList: function (navigator) {
+    var archiveMenu = this.state.showOnlyArchived ? "Show Links" : "Show Archived";
+
     var drawerView = (
       <View>
         <TouchableHighlight
           style={styles.drawer}
           onPress={() => this._onShortenClicked(navigator)}>
           <Text style={styles.drawer_item}>Shorten New Link</Text>
+        </TouchableHighlight>
+        <TouchableHighlight
+          style={styles.drawer}
+          onPress={() => this._onArchivedToggle(navigator)}>
+          <Text style={styles.drawer_item}>{archiveMenu}</Text>
         </TouchableHighlight>
         <TouchableHighlight
           style={styles.drawer}

@@ -103,8 +103,12 @@ methods.authenticate = function (username, password, callback) {
     .done();
 };
 
-methods.getMyLinks = function (callback) {
-  var params = { access_token: this._accessToken };
+methods.getMyLinks = function (onlyArchived, callback) {
+  var archived = onlyArchived ? "on" : "off";
+  var params = {
+    access_token: this._accessToken,
+    archived: archived,
+  };
 
   var linkHistoryPath = "/user/link_history";
   var url = Utils.buildUrl(BITLY_API_BASE_URL + linkHistoryPath, params);
