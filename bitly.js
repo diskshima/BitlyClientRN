@@ -106,17 +106,24 @@ methods.authenticate = function (username, password, callback) {
 methods.getMyLinks = function (callback) {
   var params = { access_token: this._accessToken };
 
-  var url = Utils.buildUrl(BITLY_API_BASE_URL + "/user/link_history", params);
+  var linkHistoryPath = "/user/link_history";
+  var url = Utils.buildUrl(BITLY_API_BASE_URL + linkHistoryPath, params);
 
   fetch(url)
     .then((response) => response.json())
+    .then((response) => {
+      if (response.status_code !== 200) {
+        console.error(linkHistoryPath + " call failed with " + resposne.status_txt);
+      }
+      return response;
+    })
     .then(callback)
     .done();
 
   return;
 };
 
-methods.addLink = function (url, onSuccess, onFail) {
+methods.addLink = function (url, callback) {
   var params = {
     access_token: this._accessToken,
     longUrl: url
@@ -127,12 +134,8 @@ methods.addLink = function (url, onSuccess, onFail) {
   fetch(url)
     .then((response) => response.json())
     .then((response) => {
-      var code = response.status_code;
-      if (code === 200) {
-        onSuccess(response.data);
-      } else {
-        onFail(response);
-      }
+      callback(response);
+      return response;
     })
     .done();
 };

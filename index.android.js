@@ -55,7 +55,8 @@ var BitlyClient = React.createClass({
           dataSource: this.state.dataSource.cloneWithRows(response.data.link_history),
         });
       } else {
-        var errMsg = linkHistoryPath + " call failed with " + resposne.status_txt;
+        var errMsg = "Failed to get links with " + response.status_code + ": "
+          + response.status_txt;
         ReactUtils.showToast(errMsg);
       }
       navigator.replace({
@@ -71,7 +72,8 @@ var BitlyClient = React.createClass({
   },
   _onLoginCallback: function (response, navigator) {
     if (response.status_txt) {
-      var errMsg = "Failed to login with " + response.status_txt;
+      var errMsg = "Failed to login with " + response.status_code + ": "
+        + response.status_txt;
       ReactUtils.showToast(errMsg);
     } else {
       ReactUtils.showToast("Successfully logged in.");
@@ -216,8 +218,14 @@ var BitlyClient = React.createClass({
   },
   _onArchive: function (shortLink, navigator) {
     bitly.archiveLink(shortLink, (response) => {
-      ReactUtils.showToast("Archived " + response.data.link_edit.link);
-      this._refreshList(navigator);
+      if (response.status_code === 200) {
+        ReactUtils.showToast("Archived " + response.data.link_edit.link);
+        this._refreshList(navigator);
+      } else {
+        var errMsg = "Failed to archive with " + response.status_code + ": "
+          + response.status_txt;
+        ReactUtils.showToast(errMsg);
+      }
     });
     navigator.pop();
   },
@@ -230,14 +238,17 @@ var BitlyClient = React.createClass({
     var url = Utils.addProtocol(this.state.newUrl);
 
     bitly.addLink(url,
-      (data) => {
-        ReactUtils.showToast("Added " + data.url);
-        this._refreshList(navigator);
-      },
       (response) => {
+        var data = response.data;
         var message = response.status_txt;
-        console.error("Failed with " + response.status_code + ": " + message);
-        ReactUtils.showToast("Error: " + message);
+
+        if (response.status_code === 200) {
+          ReactUtils.showToast("Added " + data.url);
+          this._refreshList(navigator);
+        } else {
+          console.error("Failed with " + response.status_code + ": " + message);
+          ReactUtils.showToast("Error: " + message);
+        }
       }
     );
   },
@@ -254,8 +265,8 @@ var BitlyClient = React.createClass({
       if (result === 200) {
         ReactUtils.showToast("Updated title");
       } else {
-        var errorMessage = "Failed to update with code = " + result +
-          ", message = " + response.status_txt;
+        var errorMessage = "Failed to update with " + result + ": " +
+          ": " + response.status_txt;
         ReactUtils.showToast(errorMessage);
       }
       navigator.pop();

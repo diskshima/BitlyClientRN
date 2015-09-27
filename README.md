@@ -13,7 +13,7 @@ TODO
 - [x] Add refresh button
 - [x] Add logout menu (inside drawer)
 - [x] Add text to login screen
-- [ ] Error handling
+- [x] Error handling
 - [ ] Separate screen for URL addition
 - [ ] Local caching
 - [ ] Support pull-to-refresh
