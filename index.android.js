@@ -16,7 +16,8 @@ var {
   TextInput,
   AsyncStorage,
   Navigator,
-  BackAndroid
+  BackAndroid,
+  DrawerLayoutAndroid,
 } = React;
 
 var LinkAndroid = require('LinkAndroid');
@@ -106,47 +107,60 @@ var BitlyClient = React.createClass({
     );
   },
   renderList: function (navigator) {
+    var drawerView = (
+      <TouchableHighlight
+        style={styles.drawer}
+        onPress={() => this._onLogoutClicked(navigator)}>
+        <Text style={styles.drawer_item}>Logout</Text>
+      </TouchableHighlight>
+    );
+
     return (
-      <View style={styles.main}>
-        <View style={styles.add_url_box}>
-          <TextInput
-            style={styles.input_field}
-            onChangeText={(text) => this.setState({ newUrl: text })}
-            value={this.state.newUrl}
-          />
-          <View style={styles.top_buttons}>
-            <Button
-              style={styles.add_button}
-              onPress={() => this._addButtonClicked(navigator)}
-              text="+" />
-            <Button
-              style={styles.refresh_button}
-              onPress={() => this._refreshList(navigator)}
-              text="Refresh" />
+      <DrawerLayoutAndroid
+        drawerWidth={150}
+        drawerPosition={DrawerLayoutAndroid.positions.Left}
+        renderNavigationView={() => drawerView}>
+        <View style={styles.main}>
+          <View style={styles.add_url_box}>
+            <TextInput
+              style={styles.input_field}
+              onChangeText={(text) => this.setState({ newUrl: text })}
+              value={this.state.newUrl}
+            />
+            <View style={styles.top_buttons}>
+              <Button
+                style={styles.add_button}
+                onPress={() => this._addButtonClicked(navigator)}
+                text="+" />
+              <Button
+                style={styles.refresh_button}
+                onPress={() => this._refreshList(navigator)}
+                text="Refresh" />
+            </View>
           </View>
-        </View>
-        <ListView
-          style={styles.list_view}
-          dataSource={this.state.dataSource}
-          renderRow={
-            (entry: Object, sectionId: number, rowId: number) => {
-              return (
-                <TouchableHighlight
-                  onPress={() => this._onPressRow(entry)}
-                  onLongPress={() => this._onLongPressRow(entry, navigator)}
-                  style={styles.row}
-                  underlayColor="#AAAAAA">
-                  <View style={styles.rowInside}>
-                    <Text style={styles.title}>{entry.title}</Text>
-                    <Text style={styles.short_url}>{entry.link}</Text>
-                    <Text style={styles.long_url}>{entry.long_url}</Text>
-                  </View>
-                </TouchableHighlight>
-              );
+          <ListView
+            style={styles.list_view}
+            dataSource={this.state.dataSource}
+            renderRow={
+              (entry: Object, sectionId: number, rowId: number) => {
+                return (
+                  <TouchableHighlight
+                    onPress={() => this._onPressRow(entry)}
+                    onLongPress={() => this._onLongPressRow(entry, navigator)}
+                    style={styles.row}
+                    underlayColor="#AAAAAA">
+                    <View style={styles.rowInside}>
+                      <Text style={styles.title}>{entry.title}</Text>
+                      <Text style={styles.short_url}>{entry.link}</Text>
+                      <Text style={styles.long_url}>{entry.long_url}</Text>
+                    </View>
+                  </TouchableHighlight>
+                );
+              }
             }
-          }
-        />
-      </View>
+          />
+        </View>
+      </DrawerLayoutAndroid>
     );
   },
   renderEdit: function (link, navigator) {
@@ -236,6 +250,17 @@ var BitlyClient = React.createClass({
       navigator.pop();
     });
   },
+  _onLogoutClicked: function (navigator) {
+    bitly.clearAccessToken((error) => {
+      if (error) {
+        ToastAndroid.show("Failed to logout", ToastAndroid.SHORT);
+      } else {
+        navigator.replace({
+          mode: Mode.Login,
+        });
+      }
+    });
+  },
   renderLoadingView: function (navigator) {
     bitly.loadFromStorage((value) => {
       var name;
@@ -311,6 +336,13 @@ var styles = StyleSheet.create({
   refresh_button: {
     margin: 5,
   },
+  drawer: {
+    padding: 10,
+    backgroundColor: "#4EA2D8",
+  },
+  drawer_item: {
+    fontSize: 15,
+  }
 });
 
 AppRegistry.registerComponent("BitlyClient", () => BitlyClient);

@@ -11,6 +11,8 @@ TODO
 - [x] Refresh on add and archive
 - [x] Automatically add http to URLs
 - [x] Add refresh button
+- [x] Add logout menu (inside drawer)
+- [ ] Add text to login screen
 - [ ] Error handling
 - [ ] Local caching
 - [ ] Support pull-to-refresh

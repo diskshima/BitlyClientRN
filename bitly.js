@@ -48,6 +48,19 @@ methods.saveAccessToken = function () {
     .done();
 };
 
+methods.clearAccessToken = function (callback) {
+  AsyncStorage.setItem(BITLY_ACCESS_TOKEN_KEY, "")
+    .then((error) => {
+      if (error) {
+        console.error("Failed to clear access token with: " + error);
+      } else {
+        this._accessToken = "";
+      }
+      callback(error);
+    })
+    .done();
+};
+
 methods.authenticate = function (username, password, callback) {
   var that = this;
   var params = {
