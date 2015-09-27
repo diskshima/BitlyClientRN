@@ -84,39 +84,40 @@ var BitlyClient = React.createClass({
     return (
       <Navigator
         initialRoute={{mode: Mode.Load}}
-        renderScene={(route, navigator) => {
-          var currentMode = route.mode;
-
-          if (!BackButtonEventListenerSet) {
-            BackAndroid.addEventListener("hardwareBackPress", () => {
-              var routes = navigator.getCurrentRoutes();
-              if (routes[routes.length-1].mode === Mode.Edit) {
-                navigator.pop();
-                return true;
-              } else {
-                return false;
-              }
-            });
-            BackButtonEventListenerSet = true;
-          }
-
-          switch (currentMode) {
-            case Mode.Load:
-              return this.renderLoadingView(navigator);
-            case Mode.Login:
-              return (
-                <Login bitly={bitly} callback={(response) => this._onLoginCallback(response, navigator)} />
-              );
-            case Mode.List:
-              return this.renderList(navigator);
-            case Mode.Edit:
-              var link = route.editLink;
-              return this.renderEdit(link, navigator);
-            }
-          }
-        }
+        renderScene={this._renderScene}
         />
     );
+  },
+  _renderScene: function (route, navigator) {
+    var currentMode = route.mode;
+
+    if (!BackButtonEventListenerSet) {
+      BackAndroid.addEventListener("hardwareBackPress", () => {
+        var routes = navigator.getCurrentRoutes();
+        if (routes[routes.length-1].mode === Mode.Edit) {
+          navigator.pop();
+          return true;
+        } else {
+          return false;
+        }
+      });
+      BackButtonEventListenerSet = true;
+    }
+
+    switch (currentMode) {
+      case Mode.Load:
+        return this.renderLoadingView(navigator);
+      case Mode.Login:
+        return (
+          <Login bitly={bitly}
+            callback={(response) => this._onLoginCallback(response, navigator)} />
+        );
+      case Mode.List:
+        return this.renderList(navigator);
+      case Mode.Edit:
+        var link = route.editLink;
+        return this.renderEdit(link, navigator);
+    }
   },
   renderList: function (navigator) {
     var drawerView = (
