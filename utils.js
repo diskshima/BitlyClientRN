@@ -96,7 +96,14 @@ var Utils = {
     }
 
     return resultArray.join('');
-  }
+  },
+  addProtocol: function (url: string): string {
+    var newUrl = url;
+    if (url.indexOf("://") === -1) {
+      newUrl = "http://" + url;
+    }
+    return newUrl;
+  },
 };
 
 module.exports = Utils;

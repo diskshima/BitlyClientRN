@@ -9,7 +9,7 @@ TODO
 - [x] Ability to accept sharing
 - [x] Make button larger
 - [x] Refresh on add and archive
-- [ ] Automatically add http to URLs
+- [x] Automatically add http to URLs
 - [ ] Add refresh button
 - [ ] Error handling
 - [ ] Local caching

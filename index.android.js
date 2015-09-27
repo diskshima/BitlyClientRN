@@ -20,9 +20,8 @@ var {
 } = React;
 
 var LinkAndroid = require('LinkAndroid');
-
+var Utils = require('./utils')
 var Login = require('./login');
-
 var Bitly = require('./bitly');
 
 var bitly = new Bitly();
@@ -201,7 +200,9 @@ var BitlyClient = React.createClass({
     });
   },
   _addButtonClicked: function (navigator) {
-    bitly.addLink(this.state.newUrl,
+    var url = Utils.addProtocol(this.state.newUrl);
+
+    bitly.addLink(url,
       (data) => {
         ToastAndroid.show("Added " + data.url, ToastAndroid.SHORT);
         this._refreshList(navigator);
