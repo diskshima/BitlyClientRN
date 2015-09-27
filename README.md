@@ -10,6 +10,7 @@ TODO
 - [x] Make button larger
 - [x] Refresh on add and archive
 - [x] Automatically add http to URLs
-- [ ] Add refresh button
+- [x] Add refresh button
 - [ ] Error handling
 - [ ] Local caching
+- [ ] Support pull-to-refresh

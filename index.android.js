@@ -114,9 +114,16 @@ var BitlyClient = React.createClass({
             onChangeText={(text) => this.setState({ newUrl: text })}
             value={this.state.newUrl}
           />
-          <Button
-            onPress={() => this._addButtonClicked(navigator)}
-            text="+" />
+          <View style={styles.top_buttons}>
+            <Button
+              style={styles.add_button}
+              onPress={() => this._addButtonClicked(navigator)}
+              text="+" />
+            <Button
+              style={styles.refresh_button}
+              onPress={() => this._refreshList(navigator)}
+              text="Refresh" />
+          </View>
         </View>
         <ListView
           style={styles.list_view}
@@ -294,6 +301,15 @@ var styles = StyleSheet.create({
   edit_page: {
     flex: 1,
     alignItems: "center",
+  },
+  top_buttons: {
+    flexDirection: "row",
+  },
+  add_button: {
+    margin: 5,
+  },
+  refresh_button: {
+    margin: 5,
   },
 });
 

@@ -20,7 +20,7 @@ var Button = React.createClass({
   render: function () {
     return (
       <TouchableHighlight
-        style={styles.button}
+        style={[this.props.style, styles.button]}
         onPress={this.props.onPress}>
         <Text style={styles.text}>{this.props.text}</Text>
       </TouchableHighlight>
