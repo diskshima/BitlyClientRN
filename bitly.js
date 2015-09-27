@@ -88,10 +88,16 @@ methods.authenticate = function (username, password, callback) {
   })
     .then((response) => response.json())
     .then((response) => {
-      // TODO Handle login failure
-      console.info("Login response: " + response);
-      that._accessToken = response.access_token;
-      that.saveAccessToken();
+      console.info("Login response: " + JSON.stringify(response));
+
+      if (response.status_txt) {
+        var errMsg = "Failed to login with " + response.status_txt;
+        console.info(errMsg);
+      } else {
+        that._accessToken = response.access_token;
+        that.saveAccessToken();
+      }
+      return response;
     })
     .then((response) => callback(response))
     .done();

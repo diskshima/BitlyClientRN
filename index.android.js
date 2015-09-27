@@ -65,8 +65,13 @@ var BitlyClient = React.createClass({
     });
   },
   _onLoginCallback: function (response, navigator) {
-    ToastAndroid.show("Successfully logged in.", ToastAndroid.SHORT);
-    this.fetchData(navigator);
+    if (response.status_txt) {
+      var errMsg = "Failed to login with " + response.status_txt;
+      ToastAndroid.show(errMsg, ToastAndroid.SHORT);
+    } else {
+      ToastAndroid.show("Successfully logged in.", ToastAndroid.SHORT);
+      this.fetchData(navigator);
+    }
   },
   render: function() {
     return (
@@ -122,6 +127,7 @@ var BitlyClient = React.createClass({
         renderNavigationView={() => drawerView}>
         <View style={styles.main}>
           <View style={styles.add_url_box}>
+            <Text>New URL to shorten</Text>
             <TextInput
               style={styles.input_field}
               onChangeText={(text) => this.setState({ newUrl: text })}

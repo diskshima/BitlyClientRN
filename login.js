@@ -31,11 +31,13 @@ var Login = React.createClass({
   render: function() {
     return (
       <View style={styles.login}>
+        <Text>Login ID</Text>
         <TextInput
-          style={{}}
+          style={styles.text_input}
           onChangeText={(text) => this.setState({ username: text })}
           value={this.state.username}
         />
+        <Text>Password</Text>
         <TextInput
           style={styles.text_input}
           secureTextEntry={true}

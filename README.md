@@ -12,7 +12,9 @@ TODO
 - [x] Automatically add http to URLs
 - [x] Add refresh button
 - [x] Add logout menu (inside drawer)
-- [ ] Add text to login screen
+- [x] Add text to login screen
 - [ ] Error handling
+- [ ] Separate screen for URL addition
 - [ ] Local caching
 - [ ] Support pull-to-refresh
+- [ ] Add icon
