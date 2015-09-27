@@ -15,6 +15,8 @@ TODO
 - [x] Add text to login screen
 - [x] Error handling
 - [ ] Separate screen for URL addition
+- [ ] Add support for archived links
+- [ ] Support for unarchiving
 - [ ] Local caching
 - [ ] Support pull-to-refresh
 - [ ] Add icon
