@@ -16,10 +16,11 @@ var {
   TextInput,
   View,
   TouchableHighlight,
-  ToastAndroid,
 } = React;
 
 var Button = require('./button');
+
+var ReactUtils = require('./react_utils.js');
 
 var Login = React.createClass({
   getInitialState: function () {
@@ -51,7 +52,7 @@ var Login = React.createClass({
   _onLoginClicked: function () {
     var username = this.state.username;
     var password = this.state.password;
-    ToastAndroid.show("Logging in " + username, ToastAndroid.SHORT);
+    ReactUtils.showToast("Logging in " + username);
     var bitly = this.props.bitly;
     var callback = this.props.callback;
 

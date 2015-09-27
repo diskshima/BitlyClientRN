@@ -12,7 +12,6 @@ var {
   View,
   ListView,
   TouchableHighlight,
-  ToastAndroid,
   TextInput,
   AsyncStorage,
   Navigator,
@@ -24,6 +23,7 @@ var LinkAndroid = require('LinkAndroid');
 var Utils = require('./utils')
 var Button = require('./button');
 var Login = require('./login');
+var ReactUtils = require('./react_utils');
 var Bitly = require('./bitly');
 
 var bitly = new Bitly();
@@ -49,10 +49,15 @@ var BitlyClient = React.createClass({
     };
   },
   fetchData: function (navigator) {
-    bitly.getMyLinks((responseData) => {
-      this.setState({
-        dataSource: this.state.dataSource.cloneWithRows(responseData.data.link_history),
-      });
+    bitly.getMyLinks((response) => {
+      if (response.status_code === 200) {
+        this.setState({
+          dataSource: this.state.dataSource.cloneWithRows(response.data.link_history),
+        });
+      } else {
+        var errMsg = linkHistoryPath + " call failed with " + resposne.status_txt;
+        ReactUtils.showToast(errMsg);
+      }
       navigator.replace({
         mode: Mode.List,
       });
@@ -67,9 +72,9 @@ var BitlyClient = React.createClass({
   _onLoginCallback: function (response, navigator) {
     if (response.status_txt) {
       var errMsg = "Failed to login with " + response.status_txt;
-      ToastAndroid.show(errMsg, ToastAndroid.SHORT);
+      ReactUtils.showToast(errMsg);
     } else {
-      ToastAndroid.show("Successfully logged in.", ToastAndroid.SHORT);
+      ReactUtils.showToast("Successfully logged in.");
       this.fetchData(navigator);
     }
   },
@@ -198,12 +203,12 @@ var BitlyClient = React.createClass({
   },
   _onPressRow: function (entry) {
     var url = entry.link;
-    ToastAndroid.show("Opening " + url + "...", ToastAndroid.SHORT);
+    ReactUtils.showToast("Opening " + url + "...");
     LinkAndroid.open(url);
   },
   _onLongPressRow: function (entry, navigator) {
     var url = entry.link;
-    ToastAndroid.show("Editing " + url, ToastAndroid.SHORT);
+    ReactUtils.showToast("Editing " + url);
     navigator.push({
       mode: Mode.Edit,
       editLink: entry,
@@ -211,7 +216,7 @@ var BitlyClient = React.createClass({
   },
   _onArchive: function (shortLink, navigator) {
     bitly.archiveLink(shortLink, (response) => {
-      ToastAndroid.show("Archived " + response.data.link_edit.link, ToastAndroid.SHORT);
+      ReactUtils.showToast("Archived " + response.data.link_edit.link);
       this._refreshList(navigator);
     });
     navigator.pop();
@@ -226,13 +231,13 @@ var BitlyClient = React.createClass({
 
     bitly.addLink(url,
       (data) => {
-        ToastAndroid.show("Added " + data.url, ToastAndroid.SHORT);
+        ReactUtils.showToast("Added " + data.url);
         this._refreshList(navigator);
       },
       (response) => {
         var message = response.status_txt;
         console.error("Failed with " + response.status_code + ": " + message);
-        ToastAndroid.show("Error: " + message, ToastAndroid.SHORT);
+        ReactUtils.showToast("Error: " + message);
       }
     );
   },
@@ -247,11 +252,11 @@ var BitlyClient = React.createClass({
     bitly.updateTitle(newEntry.link, newEntry.title, (response) => {
       var result = response.status_code;
       if (result === 200) {
-        ToastAndroid.show("Updated title", ToastAndroid.SHORT);
+        ReactUtils.showToast("Updated title");
       } else {
         var errorMessage = "Failed to update with code = " + result +
           ", message = " + response.status_txt;
-        ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+        ReactUtils.showToast(errorMessage);
       }
       navigator.pop();
     });
@@ -259,7 +264,7 @@ var BitlyClient = React.createClass({
   _onLogoutClicked: function (navigator) {
     bitly.clearAccessToken((error) => {
       if (error) {
-        ToastAndroid.show("Failed to logout", ToastAndroid.SHORT);
+        ReactUtils.showToast("Failed to logout");
       } else {
         navigator.replace({
           mode: Mode.Login,
