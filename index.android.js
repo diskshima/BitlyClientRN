@@ -21,6 +21,7 @@ var {
 
 var LinkAndroid = require('LinkAndroid');
 var Utils = require('./utils')
+var Button = require('./button');
 var Login = require('./login');
 var Bitly = require('./bitly');
 
@@ -113,11 +114,9 @@ var BitlyClient = React.createClass({
             onChangeText={(text) => this.setState({ newUrl: text })}
             value={this.state.newUrl}
           />
-          <TouchableHighlight
-            style={styles.button}
-            onPress={() => this._addButtonClicked(navigator)}>
-            <Text style={styles.button_text}>+</Text>
-          </TouchableHighlight>
+          <Button
+            onPress={() => this._addButtonClicked(navigator)}
+            text="+" />
         </View>
         <ListView
           style={styles.list_view}
@@ -161,16 +160,12 @@ var BitlyClient = React.createClass({
               },
             });
           }} />
-        <TouchableHighlight
-          style={styles.button}
-          onPress={() => this._updateButtonClicked(navigator)}>
-          <Text style={styles.button_text}>Update</Text>
-        </TouchableHighlight>
-        <TouchableHighlight
-          style={styles.button}
-          onPress={() => this._onArchive(showLink.link, navigator)}>
-          <Text style={styles.button_text}>Archive</Text>
-        </TouchableHighlight>
+        <Button
+          onPress={() => this._updateButtonClicked(navigator)}
+          text="Update" />
+        <Button
+          onPress={() => this._onArchive(showLink.link, navigator)}
+          text="Archive" />
       </View>
     );
   },
@@ -295,17 +290,6 @@ var styles = StyleSheet.create({
     backgroundColor: "#F5FCFF",
   },
   input_field: {
-  },
-  button: {
-    backgroundColor: "#E2F5FD",
-    width: 70,
-    marginBottom: 5,
-  },
-  button_text: {
-    color: "#EA4A0E",
-    textAlign: "center",
-    alignItems: "stretch",
-    fontSize: 18,
   },
   edit_page: {
     flex: 1,

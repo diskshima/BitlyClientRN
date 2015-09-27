@@ -19,6 +19,8 @@ var {
   ToastAndroid,
 } = React;
 
+var Button = require('./button');
+
 var Login = React.createClass({
   getInitialState: function () {
     return {
@@ -40,11 +42,7 @@ var Login = React.createClass({
           onChangeText={(text) => this.setState({ password: text })}
           value={this.state.password}
         />
-        <TouchableHighlight
-          style={styles.button}
-          onPress={this._onLoginClicked}>
-          <Text style={styles.button_text}>Login</Text>
-        </TouchableHighlight>
+        <Button onPress={this._onLoginClicked} text="Login" />
       </View>
     );
   },
@@ -70,9 +68,6 @@ var styles = StyleSheet.create({
     borderColor: 'gray',
     borderWidth: 1,
   },
-  button: {
-    backgroundColor: "#E2F5FD",
-  }
 });
 
 AppRegistry.registerComponent('Login', () => Login);
