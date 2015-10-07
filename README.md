@@ -19,4 +19,5 @@ TODO
 - [ ] Support for unarchiving
 - [ ] Local caching
 - [ ] Support pull-to-refresh
-- [ ] Add icon
+- [ ] Add app icon
+- [ ] Multiple logins
