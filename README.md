@@ -16,6 +16,7 @@ TODO
 - [x] Error handling
 - [x] Separate screen for URL addition
 - [x] Add support for archived links
+- [x] Support for sharing bit links
 - [ ] Support for unarchiving
 - [ ] Local caching
 - [ ] Support pull-to-refresh

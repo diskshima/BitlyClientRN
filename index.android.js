@@ -25,6 +25,7 @@ var Button = require('./button');
 var Login = require('./login');
 var ReactUtils = require('./react_utils');
 var Bitly = require('./bitly');
+var Share = require('react-native-share');
 
 var bitly = new Bitly();
 
@@ -217,6 +218,9 @@ var BitlyClient = React.createClass({
           onPress={() => this._updateButtonClicked(navigator)}
           text="Update" />
         <Button
+          onPress={() => this._onShare(showLink.link, navigator)}
+          text="Share" />
+        <Button
           onPress={() => this._onArchive(showLink.link, navigator)}
           text="Archive" />
       </View>
@@ -321,6 +325,15 @@ var BitlyClient = React.createClass({
         ReactUtils.showToast(errorMessage);
       }
       navigator.pop();
+    });
+  },
+  _onShare: function (shortLink, navigator) {
+    Share.open({
+      share_text: "",
+      share_URL: shortLink,
+      title: "Share Link",
+    }, function (error) {
+      console.error(error);
     });
   },
   _onLogoutClicked: function (navigator) {
