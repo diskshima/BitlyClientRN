@@ -27,6 +27,15 @@ var ReactUtils = require('./react_utils');
 var Bitly = require('./bitly');
 var Share = require('react-native-share');
 
+var DropDown = require('react-native-dropdown');
+
+var {
+  Select,
+  Option,
+  OptionList,
+  updatePosition
+} = DropDown;
+
 var bitly = new Bitly();
 
 var Mode = {
@@ -40,6 +49,7 @@ var Mode = {
 var BackButtonEventListenerSet = false;
 
 var BitlyClient = React.createClass({
+  optionList: undefined,
   getInitialState: function () {
     var sharedUrl = this.props.sharedUrl;
     var mode = sharedUrl ? Mode.Add : Mode.Load;
@@ -226,21 +236,37 @@ var BitlyClient = React.createClass({
       </View>
     );
   },
+  _setDomain: function (domain) {
+    this.setState({
+      domain: domain
+    });
+  },
   _renderAdd: function (navigator) {
     return (
       <View style={styles.add_url_box}>
-        <Text>New URL to shorten</Text>
-        <TextInput
-          style={styles.input_field}
-          onChangeText={(text) => this.setState({ newUrl: text })}
-          value={this.state.newUrl}
-        />
         <View style={styles.top_buttons}>
           <Button
             style={styles.add_button}
             onPress={() => this._addButtonClicked(navigator)}
             text="+" />
         </View>
+        <Text>New URL to shorten</Text>
+        <TextInput
+          style={styles.input_field}
+          onChangeText={(text) => this.setState({ newUrl: text })}
+          value={this.state.newUrl}
+        />
+        <Select
+          width={100}
+          ref="DOMAIN"
+          defaultValue="bit.ly"
+          optionListRef={() => this.optionList}
+          onSelect={(domain) => this._setDomain(domain) }>
+          <Option>bit.ly</Option>
+          <Option>bitly.com</Option>
+          <Option>j.mp</Option>
+        </Select>
+        <OptionList ref={(c) => this.optionList = c} />
       </View>
     );
   },
@@ -281,10 +307,11 @@ var BitlyClient = React.createClass({
   },
   _addButtonClicked: function (navigator) {
     var url = Utils.addProtocol(this.state.newUrl);
+    var domain = this.state.domain || "bit.ly";
 
     bitly.loadFromStorage((value) => {
       if (value) {
-        bitly.addLink(url,
+        bitly.addLink(url, domain,
           (response) => {
             var data = response.data;
             var message = response.status_txt;

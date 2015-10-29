@@ -18,6 +18,10 @@ TODO
 - [x] Add support for archived links
 - [x] Support for sharing bit links
 - [ ] Support for unarchiving
+- [x] Select from bit.ly, bitly.com, j.mp
+- [ ] Use [Flux pattern](https://github.com/aksonov/react-native-router-flux)
+- [ ] Upgrade to React Native 0.13
+    - consts!
 - [ ] Local caching
 - [ ] Support pull-to-refresh
 - [ ] Add icon

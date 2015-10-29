@@ -127,10 +127,11 @@ methods.getMyLinks = function (onlyArchived, callback) {
   return;
 };
 
-methods.addLink = function (url, callback) {
+methods.addLink = function (url, domain, callback) {
   var params = {
     access_token: this._accessToken,
-    longUrl: url
+    longUrl: url,
+    domain: domain,
   };
 
   var url = Utils.buildUrl(BITLY_API_BASE_URL + "/shorten", params);
