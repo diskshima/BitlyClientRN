@@ -24,4 +24,5 @@ TODO
     - consts!
 - [ ] Local caching
 - [ ] Support pull-to-refresh
-- [ ] Add icon
+- [ ] Add app icon
+- [ ] Multiple logins
