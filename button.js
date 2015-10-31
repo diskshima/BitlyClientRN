@@ -31,7 +31,7 @@ var Button = React.createClass({
 var styles = StyleSheet.create({
   button: {
     backgroundColor: "#E2F5FD",
-    width: 70,
+    width: 100,
     marginBottom: 5,
   },
   text: {

@@ -15,7 +15,7 @@
 - [x] Separate screen for URL addition
 - [x] Add support for archived links
 - [x] Support for sharing bit links
-- [ ] Support for unarchiving
+- [x] Support for unarchiving
 - [x] Select from bit.ly, bitly.com, j.mp
 - [x] Upgrade to React Native 0.13
     - consts!

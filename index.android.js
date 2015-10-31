@@ -209,6 +209,8 @@ var BitlyClient = React.createClass({
   renderEdit: function (link, navigator) {
 
     var showLink = this.state.newEditLink || link;
+    var isArchived = showLink.archived;
+    var archiveButtonText = isArchived ? "Unarchive" : "Archive";
 
     return (
       <View style={styles.edit_page}>
@@ -220,6 +222,7 @@ var BitlyClient = React.createClass({
               newEditLink: {
                 link: showLink.link,
                 long_url: showLink.long_url,
+                archived: showLink.archived,
                 title: text,
               },
             });
@@ -231,8 +234,8 @@ var BitlyClient = React.createClass({
           onPress={() => this._onShare(showLink.link, navigator)}
           text="Share" />
         <Button
-          onPress={() => this._onArchive(showLink.link, navigator)}
-          text="Archive" />
+          onPress={() => this._onArchive(showLink, navigator)}
+          text={archiveButtonText} />
       </View>
     );
   },
@@ -283,17 +286,30 @@ var BitlyClient = React.createClass({
       editLink: entry,
     });
   },
-  _onArchive: function (shortLink, navigator) {
-    bitly.archiveLink(shortLink, (response) => {
-      if (response.status_code === 200) {
-        ReactUtils.showToast("Archived " + response.data.link_edit.link);
-        this._refreshList(navigator);
-      } else {
-        var errMsg = "Failed to archive with " + response.status_code + ": "
-          + response.status_txt;
-        ReactUtils.showToast(errMsg);
-      }
-    });
+  _onArchive: function (link, navigator) {
+    if (link.archived) {
+      bitly.unarchiveLink(link.link, (response) => {
+        if (response.status_code === 200) {
+          ReactUtils.showToast("Unarchived " + response.data.link_edit.link);
+          this._refreshList(navigator);
+        } else {
+          var errMsg = "Failed to unarchive with " + response.status_code + ": "
+            + response.status_txt;
+          ReactUtils.showToast(errMsg);
+        }
+      });
+    } else {
+      bitly.archiveLink(link.link, (response) => {
+        if (response.status_code === 200) {
+          ReactUtils.showToast("Archived " + response.data.link_edit.link);
+          this._refreshList(navigator);
+        } else {
+          var errMsg = "Failed to archive with " + response.status_code + ": "
+            + response.status_txt;
+          ReactUtils.showToast(errMsg);
+        }
+      });
+    }
     navigator.pop();
   },
   _refreshList: function (navigator) {
