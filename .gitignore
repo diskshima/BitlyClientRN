@@ -31,3 +31,4 @@ npm-debug.log
 #
 android/.gradle
 android/app/src/main/assets/
+android/app/build/
