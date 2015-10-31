@@ -127,7 +127,6 @@ methods.getMyLinks = function (onlyArchived, force, callback) {
               console.error("Failed to save links with %j", error);
             }
           })
-          .done();
         return response;
       })
       .then(callback)
@@ -142,8 +141,7 @@ methods.getMyLinks = function (onlyArchived, force, callback) {
           console.warn("Failed to retrieve links from storage. Fetching from web.");
           getMyLinks(onlyArchived, true, callback);
         }
-      })
-      .done();
+      });
   }
 
   return;
