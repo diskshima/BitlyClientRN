@@ -64,7 +64,13 @@ var BitlyClient = React.createClass({
     };
   },
   fetchData: function (navigator) {
-    bitly.getMyLinks(this.state.showOnlyArchived, (response) => {
+    var forceRefresh = this.state.forceRefresh;
+
+    if (this.state.forceRefresh === undefined) {
+      forceRefresh = true;
+    }
+
+    bitly.getMyLinks(this.state.showOnlyArchived, forceRefresh, (response) => {
       if (response.status_code === 200) {
         this.setState({
           dataSource: this.state.dataSource.cloneWithRows(response.data.link_history),
@@ -179,7 +185,7 @@ var BitlyClient = React.createClass({
         <View style={styles.main}>
           <Button
             style={styles.refresh_button}
-            onPress={() => this._refreshList(navigator)}
+            onPress={() => this._refreshList(navigator, true)}
             text="Refresh" />
           <ListView
             style={styles.list_view}
@@ -291,7 +297,7 @@ var BitlyClient = React.createClass({
       bitly.unarchiveLink(link.link, (response) => {
         if (response.status_code === 200) {
           ReactUtils.showToast("Unarchived " + response.data.link_edit.link);
-          this._refreshList(navigator);
+          this._refreshList(navigator, true);
         } else {
           var errMsg = "Failed to unarchive with " + response.status_code + ": "
             + response.status_txt;
@@ -302,7 +308,7 @@ var BitlyClient = React.createClass({
       bitly.archiveLink(link.link, (response) => {
         if (response.status_code === 200) {
           ReactUtils.showToast("Archived " + response.data.link_edit.link);
-          this._refreshList(navigator);
+          this._refreshList(navigator, true);
         } else {
           var errMsg = "Failed to archive with " + response.status_code + ": "
             + response.status_txt;
@@ -312,13 +318,14 @@ var BitlyClient = React.createClass({
     }
     navigator.pop();
   },
-  _refreshList: function (navigator) {
+  _refreshList: function (navigator, forceRefresh) {
     this.setState({
       newUrl: '',
     });
 
     navigator.replace({
       mode: Mode.Load,
+      forceRefresh: forceRefresh
     });
   },
   _addButtonClicked: function (navigator) {

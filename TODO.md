@@ -19,7 +19,8 @@
 - [x] Select from bit.ly, bitly.com, j.mp
 - [x] Upgrade to React Native 0.13
     - consts!
-- [ ] Local caching
+- [x] Local caching
+    - Not used yet though.
 - [ ] Show more at scroll end
 - [ ] Support pull-to-refresh
 - [ ] Add app icon

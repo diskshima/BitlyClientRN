@@ -18,6 +18,7 @@ var Utils = require('./utils')
 var BITLY_HOST_URL  = "https://api-ssl.bitly.com";
 var BITLY_API_BASE_URL = BITLY_HOST_URL + "/v3";
 var BITLY_ACCESS_TOKEN_KEY = "bitly_access_token";
+var BITLY_LINK_LIST_KEY = "bitly_link_list_key";
 
 var methods = Bitly.prototype;
 
@@ -103,26 +104,47 @@ methods.authenticate = function (username, password, callback) {
     .done();
 };
 
-methods.getMyLinks = function (onlyArchived, callback) {
-  var archived = onlyArchived ? "on" : "off";
-  var params = {
-    access_token: this._accessToken,
-    archived: archived,
-  };
+methods.getMyLinks = function (onlyArchived, force, callback) {
+  if (onlyArchived || force) {
+    var archived = onlyArchived ? "on" : "off";
+    var params = {
+      access_token: this._accessToken,
+      archived: archived,
+    };
 
-  var linkHistoryPath = "/user/link_history";
-  var url = Utils.buildUrl(BITLY_API_BASE_URL + linkHistoryPath, params);
+    var linkHistoryPath = "/user/link_history";
+    var url = Utils.buildUrl(BITLY_API_BASE_URL + linkHistoryPath, params);
 
-  fetch(url)
-    .then((response) => response.json())
-    .then((response) => {
-      if (response.status_code !== 200) {
-        console.error(linkHistoryPath + " call failed with " + resposne.status_txt);
-      }
-      return response;
-    })
-    .then(callback)
-    .done();
+    fetch(url)
+      .then((response) => response.json())
+      .then((response) => {
+        if (response.status_code !== 200) {
+          console.error(linkHistoryPath + " call failed with " + resposne.status_txt);
+        }
+        AsyncStorage.setItem(BITLY_LINK_LIST_KEY, response)
+          .then((error) => {
+            if (error) {
+              console.error("Failed to save links with %j", error);
+            }
+          })
+          .done();
+        return response;
+      })
+      .then(callback)
+      .done();
+  } else {
+    AsyncStorage.getItem(BITLY_LINK_LIST_KEY)
+      .then((value) => {
+        if (value) {
+          console.info("Fetched links from storage.");
+          callback(value);
+        } else {
+          console.warn("Failed to retrieve links from storage. Fetching from web.");
+          getMyLinks(onlyArchived, true, callback);
+        }
+      })
+      .done();
+  }
 
   return;
 };
