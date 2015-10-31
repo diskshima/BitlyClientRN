@@ -256,7 +256,7 @@ var BitlyClient = React.createClass({
         <View style={styles.top_buttons}>
           <Button
             style={styles.add_button}
-            onPress={() => this._addButtonClicked(navigator)}
+            onPress={() => this._addButtonPressed(navigator)}
             text="+" />
         </View>
         <Text>New URL to shorten</Text>
@@ -328,7 +328,12 @@ var BitlyClient = React.createClass({
       forceRefresh: forceRefresh
     });
   },
-  _addButtonClicked: function (navigator) {
+  _addButtonPressed: function (navigator) {
+    if (this.state.newUrl === undefined) {
+      ReactUtils.showToast("Please enter a URL.");
+      return;
+    }
+
     var url = Utils.addProtocol(this.state.newUrl);
     var domain = this.state.domain || "bit.ly";
 
