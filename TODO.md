@@ -20,6 +20,7 @@
 - [x] Upgrade to React Native 0.13
     - consts!
 - [ ] Local caching
+- [ ] Show more at scroll end
 - [ ] Support pull-to-refresh
 - [ ] Add app icon
 - [ ] Multiple logins

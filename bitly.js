@@ -24,7 +24,7 @@ var methods = Bitly.prototype;
 function Bitly() {
 }
 
-methods.loadFromStorage = function (callback) {
+methods.loadAccessTokenFromStorage = function (callback) {
   AsyncStorage.getItem(BITLY_ACCESS_TOKEN_KEY)
     .then((value) => {
       if (value) {
@@ -38,7 +38,7 @@ methods.loadFromStorage = function (callback) {
     .done();
 };
 
-methods.saveAccessToken = function () {
+methods.saveAccessTokenToStorage = function () {
   AsyncStorage.setItem(BITLY_ACCESS_TOKEN_KEY, this._accessToken)
     .then((error) => {
       if (error) {
@@ -95,7 +95,7 @@ methods.authenticate = function (username, password, callback) {
         console.info(errMsg);
       } else {
         that._accessToken = response.access_token;
-        that.saveAccessToken();
+        that.saveAccessTokenToStorage();
       }
       return response;
     })

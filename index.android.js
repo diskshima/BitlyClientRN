@@ -325,7 +325,7 @@ var BitlyClient = React.createClass({
     var url = Utils.addProtocol(this.state.newUrl);
     var domain = this.state.domain || "bit.ly";
 
-    bitly.loadFromStorage((value) => {
+    bitly.loadAccessTokenFromStorage((value) => {
       if (value) {
         bitly.addLink(url, domain,
           (response) => {
@@ -391,7 +391,7 @@ var BitlyClient = React.createClass({
     });
   },
   renderLoadingView: function (navigator) {
-    bitly.loadFromStorage((value) => {
+    bitly.loadAccessTokenFromStorage((value) => {
       var name;
       var mode;
       if (value) {
