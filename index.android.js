@@ -71,21 +71,27 @@ var BitlyClient = React.createClass({
       forceRefresh = true;
     }
 
-    bitly.getMyLinks({ onlyArchived: this.state.showOnlyArchived, force: forceRefresh }, (response) => {
-      if (response.status_code === 200) {
-        this.currentLinks = response.data.link_history;
-        this.setState({
-          dataSource: this.state.dataSource.cloneWithRows(this.currentLinks),
+    bitly.getMyLinks(
+      {
+        onlyArchived: this.state.showOnlyArchived,
+        force: forceRefresh,
+      },
+      (response) => {
+        if (response.status_code === 200) {
+          this.currentLinks = response.data.link_history;
+          this.setState({
+            dataSource: this.state.dataSource.cloneWithRows(this.currentLinks),
+          });
+        } else {
+          var errMsg = "Failed to get links with " + response.status_code + ": "
+            + response.status_txt;
+          ReactUtils.showToast(errMsg);
+        }
+        navigator.replace({
+          mode: Mode.List,
         });
-      } else {
-        var errMsg = "Failed to get links with " + response.status_code + ": "
-          + response.status_txt;
-        ReactUtils.showToast(errMsg);
       }
-      navigator.replace({
-        mode: Mode.List,
-      });
-    });
+    );
   },
   fetchDummyData: function () {
     this.setState({
