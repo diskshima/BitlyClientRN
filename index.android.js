@@ -51,6 +51,7 @@ var BackButtonEventListenerSet = false;
 var BitlyClient = React.createClass({
   optionList: undefined,
   currentLinks: [],
+  isLoadingMore: false,
   getInitialState: function () {
     var sharedUrl = this.props.sharedUrl;
     var mode = sharedUrl ? Mode.Add : Mode.Load;
@@ -223,6 +224,13 @@ var BitlyClient = React.createClass({
   },
   _loadMoreRows: function () {
     ReactUtils.showToast("Loading more data...");
+
+    if (this.isLoadingMore) {
+      console.info("Already loading more.");
+      return;
+    }
+
+    this.isLoadingMore = true;
     bitly.getMyLinks(
       {
         onlyArchived: this.state.showOnlyArchived,
@@ -230,8 +238,10 @@ var BitlyClient = React.createClass({
       },
       (response) => {
         const newLinks = response.data.link_history;
+
         if (response.status_code === 200) {
           this.currentLinks = this.currentLinks.concat(newLinks);
+          this.isLoadingMore = false;
           this.setState({
             dataSource: this.state.dataSource.cloneWithRows(this.currentLinks),
           });
