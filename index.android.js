@@ -70,7 +70,7 @@ var BitlyClient = React.createClass({
       forceRefresh = true;
     }
 
-    bitly.getMyLinks(this.state.showOnlyArchived, forceRefresh, (response) => {
+    bitly.getMyLinks({ onlyArchived: this.state.showOnlyArchived, force: forceRefresh }, (response) => {
       if (response.status_code === 200) {
         this.setState({
           dataSource: this.state.dataSource.cloneWithRows(response.data.link_history),

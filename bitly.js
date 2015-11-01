@@ -104,7 +104,10 @@ methods.authenticate = function (username, password, callback) {
     .done();
 };
 
-methods.getMyLinks = function (onlyArchived, force, callback) {
+methods.getMyLinks = function (params, callback) {
+  var onlyArchived = params.onlyArchived;
+  var force = params.force || false;
+
   if (onlyArchived || force) {
     var archived = onlyArchived ? "on" : "off";
     var params = {
@@ -139,7 +142,7 @@ methods.getMyLinks = function (onlyArchived, force, callback) {
           callback(value);
         } else {
           console.warn("Failed to retrieve links from storage. Fetching from web.");
-          getMyLinks(onlyArchived, true, callback);
+          getMyLinks({ onlyArchived: onlyArchived, force: true }, callback);
         }
       });
   }
