@@ -22,7 +22,14 @@
 - [x] Local caching
     - Not used yet though.
 - [x] Show more at scroll end
-- [ ] Support pull-to-refresh
 - [ ] Add app icon
+- [ ] Design
+- [ ] Google Play Release!
+- [ ] Upgrade to React Native 0.14
+- [ ] Click counts
+- [ ] Show canonical short links
+- [ ] iOS client
+- [ ] Support pull-to-refresh
+- [ ] Support for other URL shorteners
 - [ ] Multiple logins
 - [ ] Use [Flux pattern](https://github.com/aksonov/react-native-router-flux)
