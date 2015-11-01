@@ -50,6 +50,7 @@ var BackButtonEventListenerSet = false;
 
 var BitlyClient = React.createClass({
   optionList: undefined,
+  currentLinks: [],
   getInitialState: function () {
     var sharedUrl = this.props.sharedUrl;
     var mode = sharedUrl ? Mode.Add : Mode.Load;
@@ -72,8 +73,9 @@ var BitlyClient = React.createClass({
 
     bitly.getMyLinks({ onlyArchived: this.state.showOnlyArchived, force: forceRefresh }, (response) => {
       if (response.status_code === 200) {
+        this.currentLinks = response.data.link_history;
         this.setState({
-          dataSource: this.state.dataSource.cloneWithRows(response.data.link_history),
+          dataSource: this.state.dataSource.cloneWithRows(this.currentLinks),
         });
       } else {
         var errMsg = "Failed to get links with " + response.status_code + ": "
@@ -207,9 +209,32 @@ var BitlyClient = React.createClass({
                 );
               }
             }
+            onEndReached={this._loadMoreRows}
           />
         </View>
       </DrawerLayoutAndroid>
+    );
+  },
+  _loadMoreRows: function () {
+    ReactUtils.showToast("Loading more data...");
+    bitly.getMyLinks(
+      {
+        onlyArchived: this.state.showOnlyArchived,
+        offset: this.currentLinks.length,
+      },
+      (response) => {
+        const newLinks = response.data.link_history;
+        if (response.status_code === 200) {
+          this.currentLinks = this.currentLinks.concat(newLinks);
+          this.setState({
+            dataSource: this.state.dataSource.cloneWithRows(this.currentLinks),
+          });
+        } else {
+          var errMsg = "Failed to unarchive with " + response.status_code + ": "
+            + response.status_txt;
+          ReactUtils.showToast(errMsg);
+        }
+      }
     );
   },
   renderEdit: function (link, navigator) {

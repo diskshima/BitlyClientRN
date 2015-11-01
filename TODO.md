@@ -21,7 +21,7 @@
     - consts!
 - [x] Local caching
     - Not used yet though.
-- [ ] Show more at scroll end
+- [x] Show more at scroll end
 - [ ] Support pull-to-refresh
 - [ ] Add app icon
 - [ ] Multiple logins

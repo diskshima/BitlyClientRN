@@ -107,29 +107,34 @@ methods.authenticate = function (username, password, callback) {
 methods.getMyLinks = function (params, callback) {
   var onlyArchived = params.onlyArchived;
   var force = params.force || false;
+  var offset = params.offset || 0;
+  var limit = params.limit || 50;
 
-  if (onlyArchived || force) {
+  if (onlyArchived || force || offset !== 0) {
     var archived = onlyArchived ? "on" : "off";
-    var params = {
+    var bitlyParams = {
       access_token: this._accessToken,
       archived: archived,
+      offset: offset,
+      limit: limit,
     };
 
     var linkHistoryPath = "/user/link_history";
-    var url = Utils.buildUrl(BITLY_API_BASE_URL + linkHistoryPath, params);
+    var url = Utils.buildUrl(BITLY_API_BASE_URL + linkHistoryPath, bitlyParams);
 
     fetch(url)
       .then((response) => response.json())
       .then((response) => {
         if (response.status_code !== 200) {
           console.error(linkHistoryPath + " call failed with " + resposne.status_txt);
+        } else if (offset === 0) {
+          AsyncStorage.setItem(BITLY_LINK_LIST_KEY, response)
+            .then((error) => {
+              if (error) {
+                console.error("Failed to save links with %j", error);
+              }
+            })
         }
-        AsyncStorage.setItem(BITLY_LINK_LIST_KEY, response)
-          .then((error) => {
-            if (error) {
-              console.error("Failed to save links with %j", error);
-            }
-          })
         return response;
       })
       .then(callback)
