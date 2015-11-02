@@ -22,7 +22,7 @@
 - [x] Local caching
     - Not used yet though.
 - [x] Show more at scroll end
-- [ ] Add app icon
+- [x] Add app icon
 - [ ] Design
 - [ ] Google Play Release!
 - [ ] Upgrade to React Native 0.14
