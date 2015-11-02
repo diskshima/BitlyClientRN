@@ -25,6 +25,8 @@
 - [x] Add app icon
 - [ ] Design
 - [ ] Google Play Release!
+- [ ] Upload code to GitHub.com
+    - Remember to remove client ID
 - [ ] Upgrade to React Native 0.14
 - [ ] Click counts
 - [ ] Show canonical short links
