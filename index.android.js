@@ -19,9 +19,9 @@ var {
   Navigator,
   BackAndroid,
   DrawerLayoutAndroid,
+  Linking,
 } = ReactNative;
 
-var LinkAndroid = require('LinkAndroid');
 var Utils = require('./utils')
 var Button = require('./button');
 var Login = require('./login');
@@ -325,7 +325,8 @@ var BitlyClient = React.createClass({
   _onPressRow: function (entry) {
     var url = entry.link;
     ReactUtils.showToast("Opening " + url + "...");
-    LinkAndroid.open(url);
+    Linking.openURL(url)
+      .catch(err => console.error('Failed to open URL: ' + url, err));
   },
   _onLongPressRow: function (entry, navigator) {
     var url = entry.link;
