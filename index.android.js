@@ -4,7 +4,9 @@
  */
 'use strict';
 
-var React = require('react-native');
+var React = require('react');
+var ReactNative = require('react-native');
+
 var {
   AppRegistry,
   StyleSheet,
@@ -17,7 +19,7 @@ var {
   Navigator,
   BackAndroid,
   DrawerLayoutAndroid,
-} = React;
+} = ReactNative;
 
 var LinkAndroid = require('LinkAndroid');
 var Utils = require('./utils')
