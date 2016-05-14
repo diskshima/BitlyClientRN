@@ -22,6 +22,7 @@ var {
   DrawerLayoutAndroid,
   Linking,
   Picker,
+  RefreshControl,
 } = ReactNative;
 
 var Utils = require('./utils')
@@ -76,6 +77,7 @@ var BitlyClient = React.createClass({
           this.currentLinks = response.data.link_history;
           this.setState({
             dataSource: this.state.dataSource.cloneWithRows(this.currentLinks),
+            refreshing: false,
           });
         } else {
           var errMsg = "Failed to get links with " + response.status_code + ": "
@@ -193,6 +195,12 @@ var BitlyClient = React.createClass({
           <ListView
             style={styles.list_view}
             dataSource={this.state.dataSource}
+            refreshControl={
+              <RefreshControl
+                refreshing={this.state.refreshing}
+                onRefresh={() => this._refreshList(navigator, true)}
+              />
+            }
             renderRow={
               (entry: Object, sectionId: number, rowId: number) => {
                 return (
@@ -351,6 +359,7 @@ var BitlyClient = React.createClass({
   _refreshList: function (navigator, forceRefresh) {
     this.setState({
       newUrl: '',
+      refreshing: true,
     });
 
     navigator.replace({
