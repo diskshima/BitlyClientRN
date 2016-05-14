@@ -21,6 +21,7 @@ var {
   BackAndroid,
   DrawerLayoutAndroid,
   Linking,
+  Picker,
 } = ReactNative;
 
 var Utils = require('./utils')
@@ -29,15 +30,6 @@ var Login = require('./login');
 var ReactUtils = require('./react_utils');
 var Bitly = require('./bitly');
 var Share = require('react-native-share');
-
-var DropDown = require('react-native-dropdown');
-
-var {
-  Select,
-  Option,
-  OptionList,
-  updatePosition
-} = DropDown;
 
 var bitly = new Bitly();
 
@@ -52,7 +44,6 @@ var Mode = {
 var BackButtonEventListenerSet = false;
 
 var BitlyClient = React.createClass({
-  optionList: undefined,
   currentLinks: [],
   isLoadingMore: false,
   getInitialState: function () {
@@ -309,17 +300,13 @@ var BitlyClient = React.createClass({
           onChangeText={(text) => this.setState({ newUrl: text })}
           value={this.state.newUrl}
         />
-        <Select
-          width={100}
-          ref="DOMAIN"
-          defaultValue="bit.ly"
-          optionListRef={() => this.optionList}
-          onSelect={(domain) => this._setDomain(domain) }>
-          <Option>bit.ly</Option>
-          <Option>bitly.com</Option>
-          <Option>j.mp</Option>
-        </Select>
-        <OptionList ref={(c) => this.optionList = c} />
+        <Picker
+          selectedValue={this.state.domain}
+          onValueChange={(domain) => this._setDomain(domain)}>
+          <Picker.Item label="bit.ly" value="bit.ly" />
+          <Picker.Item label="bitly.com" value="bitly.com" />
+          <Picker.Item label="j.mp" value="j.mp" />
+        </Picker>
       </View>
     );
   },
