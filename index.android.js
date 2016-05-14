@@ -505,6 +505,7 @@ var styles = StyleSheet.create({
   edit_page: {
     flex: 1,
     alignItems: "center",
+    backgroundColor: "#F5FCFF",
   },
   top_buttons: {
     flexDirection: "row",
