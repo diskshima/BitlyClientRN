@@ -1,10 +1,13 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
+ * bit.ly Client for Android in React Native
+ *
+ * Main class
  */
 'use strict';
 
-var React = require('react-native');
+var React = require('react');
+var ReactNative = require('react-native');
+
 var {
   AppRegistry,
   StyleSheet,
@@ -17,24 +20,16 @@ var {
   Navigator,
   BackAndroid,
   DrawerLayoutAndroid,
-} = React;
+  Linking,
+  Picker,
+} = ReactNative;
 
-var LinkAndroid = require('LinkAndroid');
 var Utils = require('./utils')
 var Button = require('./button');
 var Login = require('./login');
 var ReactUtils = require('./react_utils');
 var Bitly = require('./bitly');
 var Share = require('react-native-share');
-
-var DropDown = require('react-native-dropdown');
-
-var {
-  Select,
-  Option,
-  OptionList,
-  updatePosition
-} = DropDown;
 
 var bitly = new Bitly();
 
@@ -49,7 +44,6 @@ var Mode = {
 var BackButtonEventListenerSet = false;
 
 var BitlyClient = React.createClass({
-  optionList: undefined,
   currentLinks: [],
   isLoadingMore: false,
   getInitialState: function () {
@@ -306,28 +300,23 @@ var BitlyClient = React.createClass({
           onChangeText={(text) => this.setState({ newUrl: text })}
           value={this.state.newUrl}
         />
-        <Select
-          width={100}
-          ref="DOMAIN"
-          defaultValue="bit.ly"
-          optionListRef={() => this.optionList}
-          onSelect={(domain) => this._setDomain(domain) }>
-          <Option>bit.ly</Option>
-          <Option>bitly.com</Option>
-          <Option>j.mp</Option>
-        </Select>
-        <OptionList ref={(c) => this.optionList = c} />
+        <Picker
+          selectedValue={this.state.domain}
+          onValueChange={(domain) => this._setDomain(domain)}>
+          <Picker.Item label="bit.ly" value="bit.ly" />
+          <Picker.Item label="bitly.com" value="bitly.com" />
+          <Picker.Item label="j.mp" value="j.mp" />
+        </Picker>
       </View>
     );
   },
   _onPressRow: function (entry) {
     var url = entry.link;
-    ReactUtils.showToast("Opening " + url + "...");
-    LinkAndroid.open(url);
+    Linking.openURL(url)
+      .catch(err => console.error('Failed to open URL: ' + url, err));
   },
   _onLongPressRow: function (entry, navigator) {
     var url = entry.link;
-    ReactUtils.showToast("Editing " + url);
     navigator.push({
       mode: Mode.Edit,
       editLink: entry,

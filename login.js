@@ -7,7 +7,8 @@
 
 'use strict';
 
-var React = require('react-native');
+var React = require('react');
+var ReactNative = require('react-native');
 
 var {
   AppRegistry,
@@ -16,7 +17,7 @@ var {
   TextInput,
   View,
   TouchableHighlight,
-} = React;
+} = ReactNative;
 
 var Button = require('./button');
 
@@ -75,4 +76,4 @@ var styles = StyleSheet.create({
 
 AppRegistry.registerComponent('Login', () => Login);
 
-module.exports = Login
+module.exports = Login;
