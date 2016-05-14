@@ -9,6 +9,6 @@
     "react-native": "^0.25.1",
     "react": "^0.14.5",
     "react-native-dropdown": "^0.0.4",
-    "react-native-share": "^1.0.4"
+    "react-native-share": "^1.0.10"
   }
 }

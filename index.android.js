@@ -1,6 +1,7 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
+ * bit.ly Client for Android in React Native
+ *
+ * Main class
  */
 'use strict';
 
@@ -324,13 +325,11 @@ var BitlyClient = React.createClass({
   },
   _onPressRow: function (entry) {
     var url = entry.link;
-    ReactUtils.showToast("Opening " + url + "...");
     Linking.openURL(url)
       .catch(err => console.error('Failed to open URL: ' + url, err));
   },
   _onLongPressRow: function (entry, navigator) {
     var url = entry.link;
-    ReactUtils.showToast("Editing " + url);
     navigator.push({
       mode: Mode.Edit,
       editLink: entry,
