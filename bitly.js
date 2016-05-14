@@ -36,7 +36,10 @@ methods.loadAccessTokenFromStorage = function (callback) {
 
       callback(null);
     })
-    .done();
+    .catch(err => {
+      this._accessToken = value;
+      console.error('Failed to read access token from storage.', err);
+    });
 };
 
 methods.saveAccessTokenToStorage = function () {
@@ -46,7 +49,7 @@ methods.saveAccessTokenToStorage = function () {
         console.error("Failed to save access token with: " + error);
       }
     })
-    .done();
+    .catch(err => console.error('Failed to save access token from storage.', err));
 };
 
 methods.clearAccessToken = function (callback) {
@@ -59,7 +62,7 @@ methods.clearAccessToken = function (callback) {
       }
       callback(error);
     })
-    .done();
+    .catch(err => console.error('Failed to clear access token from storage.', err));
 };
 
 methods.authenticate = function (username, password, callback) {
@@ -101,7 +104,7 @@ methods.authenticate = function (username, password, callback) {
       return response;
     })
     .then((response) => callback(response))
-    .done();
+    .catch(err => console.error('Failed to authenticate with bit.ly.', err));
 };
 
 methods.getMyLinks = function (params, callback) {
@@ -138,7 +141,7 @@ methods.getMyLinks = function (params, callback) {
         return response;
       })
       .then(callback)
-      .done();
+      .catch(err => console.error('Failed to retrieve links from server.', err));
   } else {
     AsyncStorage.getItem(BITLY_LINK_LIST_KEY)
       .then((value) => {
@@ -149,7 +152,8 @@ methods.getMyLinks = function (params, callback) {
           console.warn("Failed to retrieve links from storage. Fetching from web.");
           getMyLinks({ onlyArchived: onlyArchived, force: true }, callback);
         }
-      });
+      })
+      .catch(err => console.error('Failed to retrieve links from storage.', err));
   }
 
   return;
@@ -170,7 +174,7 @@ methods.addLink = function (url, domain, callback) {
       callback(response);
       return response;
     })
-    .done();
+    .catch(err => console.error('Failed to add link.', err));
 };
 
 methods.updateTitle = function (shortLink, title, callback) {
@@ -212,7 +216,7 @@ methods.sendLinkEdit = function (params, callback) {
   fetch(url)
     .then((response) => response.json())
     .then(callback)
-    .done();
+    .catch(err => console.error('Failed to save edits', err));
 };
 
 methods.getDummyList = function () {

@@ -22,6 +22,7 @@ var {
   DrawerLayoutAndroid,
   Linking,
   Picker,
+  RefreshControl,
 } = ReactNative;
 
 var Utils = require('./utils')
@@ -57,6 +58,7 @@ var BitlyClient = React.createClass({
       newUrl: sharedUrl,
       initialMode: mode,
       showOnlyArchived: false,
+      refreshing: false,
     };
   },
   fetchData: function (navigator) {
@@ -72,6 +74,9 @@ var BitlyClient = React.createClass({
         force: forceRefresh,
       },
       (response) => {
+        this.setState({
+          refreshing: false,
+        });
         if (response.status_code === 200) {
           this.currentLinks = response.data.link_history;
           this.setState({
@@ -186,13 +191,15 @@ var BitlyClient = React.createClass({
         drawerPosition={DrawerLayoutAndroid.positions.Left}
         renderNavigationView={() => drawerView}>
         <View style={styles.main}>
-          <Button
-            style={styles.refresh_button}
-            onPress={() => this._refreshList(navigator, true)}
-            text="Refresh" />
           <ListView
             style={styles.list_view}
             dataSource={this.state.dataSource}
+            refreshControl={
+              <RefreshControl
+                refreshing={this.state.refreshing}
+                onRefresh={() => this._refreshList(navigator, true)}
+              />
+            }
             renderRow={
               (entry: Object, sectionId: number, rowId: number) => {
                 return (
@@ -351,10 +358,11 @@ var BitlyClient = React.createClass({
   _refreshList: function (navigator, forceRefresh) {
     this.setState({
       newUrl: '',
+      refreshing: true,
     });
 
     navigator.replace({
-      mode: Mode.Load,
+      mode: Mode.List,
       forceRefresh: forceRefresh
     });
   },
@@ -502,9 +510,6 @@ var styles = StyleSheet.create({
     flexDirection: "row",
   },
   add_button: {
-    margin: 5,
-  },
-  refresh_button: {
     margin: 5,
   },
   drawer: {
