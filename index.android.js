@@ -7,6 +7,7 @@
 
 var React = require('react');
 var ReactNative = require('react-native');
+import Icon from 'react-native-vector-icons/Octicons';
 
 var {
   AppRegistry,
@@ -188,8 +189,12 @@ var BitlyClient = React.createClass({
       <DrawerLayoutAndroid
         drawerWidth={150}
         drawerPosition={DrawerLayoutAndroid.positions.Left}
+        ref={this.setDrawerInstance}
         renderNavigationView={() => drawerView}>
         <View style={styles.main}>
+          <View style={styles.topmenu}>
+            <Icon name="three-bars" size={35} color="black" onPress={this._openDrawer} />
+          </View>
           <ListView
             style={styles.list_view}
             dataSource={this.state.dataSource}
@@ -220,6 +225,17 @@ var BitlyClient = React.createClass({
         </View>
       </DrawerLayoutAndroid>
     );
+  },
+  drawerInstance: {
+    instance : {
+      openDrawer : function() {}
+    }
+  },
+  setDrawerInstance: function (instance) {
+    this.drawerInstance.instance = instance;
+  },
+  _openDrawer: function () {
+    this.drawerInstance.instance.openDrawer();
   },
   _loadMoreRows: function () {
     ReactUtils.showToast("Loading more data...");
@@ -462,6 +478,12 @@ var styles = StyleSheet.create({
   loading: {
     flex: 1,
     alignItems: "center",
+  },
+  topmenu: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 10,
+    height: 50,
   },
   row: {
     flex: 1,
