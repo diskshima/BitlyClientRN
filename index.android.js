@@ -208,9 +208,8 @@ var BitlyClient = React.createClass({
                     style={styles.row}
                     underlayColor="#AAAAAA">
                     <View style={styles.rowInside}>
-                      <Text style={styles.title}>{entry.title}</Text>
+                      <Text style={styles.title}>{entry.title || entry.long_url}</Text>
                       <Text style={styles.short_url}>{entry.link}</Text>
-                      <Text style={styles.long_url}>{entry.long_url}</Text>
                     </View>
                   </TouchableHighlight>
                 );
@@ -467,26 +466,21 @@ var styles = StyleSheet.create({
   row: {
     flex: 1,
     justifyContent: "space-between",
-    backgroundColor: "#F5FCFF",
-    borderWidth: 2,
-    borderColor: "#4EA2D8",
-    margin: 5,
+    backgroundColor: "white",
+    borderBottomWidth: 1,
+    borderBottomColor: "#4EA2D8",
   },
   rowInside: {
-    margin: 5,
+    margin: 9,
   },
   title: {
+    color: "black",
     fontSize: 15,
     marginBottom: 5,
   },
   short_url: {
     color: "#EA4A0E",
     marginLeft: 5,
-    marginBottom: 5,
-  },
-  long_url: {
-    fontSize: 12,
-    color: "#535353",
     marginBottom: 5,
   },
   main: {
@@ -497,14 +491,14 @@ var styles = StyleSheet.create({
   },
   list_view: {
     flexDirection: "column",
-    backgroundColor: "#F5FCFF",
+    backgroundColor: "white",
   },
   input_field: {
   },
   edit_page: {
     flex: 1,
     alignItems: "center",
-    backgroundColor: "#F5FCFF",
+    backgroundColor: "white",
   },
   top_buttons: {
     flexDirection: "row",
