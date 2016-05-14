@@ -16,7 +16,6 @@ var {
   ListView,
   TouchableHighlight,
   TextInput,
-  AsyncStorage,
   Navigator,
   BackAndroid,
   DrawerLayoutAndroid,
