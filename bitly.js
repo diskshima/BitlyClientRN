@@ -99,7 +99,9 @@ methods.authenticate = function (username, password, callback) {
       return response;
     })
     .then((response) => callback(response))
-    .catch(err => console.error('Failed to authenticate with bit.ly.', err));
+    .catch((error) => {
+      console.error('Failed to authenticate with bit.ly.', error)
+    });
 };
 
 methods.getMyLinks = function (params, callback) {

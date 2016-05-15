@@ -185,7 +185,7 @@ var BitlyClient = React.createClass({
 
     return (
       <DrawerLayoutAndroid
-        drawerWidth={150}
+        drawerWidth={200}
         drawerPosition={DrawerLayoutAndroid.positions.Left}
         ref={this.setDrawerInstance}
         renderNavigationView={() => drawerView}>
@@ -226,7 +226,9 @@ var BitlyClient = React.createClass({
   },
   drawerInstance: {
     instance : {
-      openDrawer : function() {}
+      openDrawer : function() {
+        console.warn('Default empty implementation.');
+      }
     }
   },
   setDrawerInstance: function (instance) {

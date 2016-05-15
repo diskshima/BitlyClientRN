@@ -30,10 +30,11 @@ class DrawerItem extends Component {
   render() {
     return (
       <TouchableHighlight
-        onPress={this.props.onPress}>
+        onPress={this.props.onPress}
+        style={styles.drawer_item}>
         <View style={styles.drawer_menu}>
           <Icon name={this.props.iconName} style={styles.drawer_item_icon} />
-          <Text style={styles.drawer_item}>{this.props.text}</Text>
+          <Text style={styles.drawer_text}>{this.props.text}</Text>
         </View>
       </TouchableHighlight>
     );
@@ -41,6 +42,9 @@ class DrawerItem extends Component {
 }
 
 var styles = StyleSheet.create({
+  drawer_item: {
+    margin: 5,
+  },
   drawer_menu: {
     flexDirection: "row",
     alignItems: "center",
@@ -53,7 +57,7 @@ var styles = StyleSheet.create({
     fontSize: 20,
     width: 25,
   },
-  drawer_item: {
+  drawer_text: {
     color: "black",
     fontSize: 15,
     marginLeft: 5,
