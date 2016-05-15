@@ -29,6 +29,7 @@ var Utils = require('./utils')
 var Button = require('./button');
 var Login = require('./login');
 var DrawerItem = require('./drawerItem');
+var AddView = require('./addView');
 var ReactUtils = require('./react_utils');
 var Bitly = require('./bitly');
 var Share = require('react-native-share');
@@ -308,27 +309,11 @@ var BitlyClient = React.createClass({
   },
   _renderAdd: function (navigator) {
     return (
-      <View style={styles.add_url_box}>
-        <View style={styles.top_buttons}>
-          <Button
-            style={styles.add_button}
-            onPress={() => this._addButtonPressed(navigator)}
-            text="+" />
-        </View>
-        <Text>New URL to shorten</Text>
-        <TextInput
-          style={styles.input_field}
-          onChangeText={(text) => this.setState({ newUrl: text })}
-          value={this.state.newUrl}
-        />
-        <Picker
-          selectedValue={this.state.domain}
-          onValueChange={(domain) => this._setDomain(domain)}>
-          <Picker.Item label="bit.ly" value="bit.ly" />
-          <Picker.Item label="bitly.com" value="bitly.com" />
-          <Picker.Item label="j.mp" value="j.mp" />
-        </Picker>
-      </View>
+      <AddView
+        url={this.state.newUrl}
+        domain={this.state.domain}
+        onAddPressed={(url, domain) => this._addButtonPressed(navigator, url, domain)}
+      />
     );
   },
   _onPressRow: function (entry) {
@@ -380,18 +365,12 @@ var BitlyClient = React.createClass({
       forceRefresh: forceRefresh
     });
   },
-  _addButtonPressed: function (navigator) {
-    if (this.state.newUrl === undefined) {
-      ReactUtils.showToast("Please enter a URL.");
-      return;
-    }
-
-    var url = Utils.addProtocol(this.state.newUrl);
-    var domain = this.state.domain || "bit.ly";
+  _addButtonPressed: function (navigator, urlEntered, domainSelected) {
+    var url = Utils.addProtocol(urlEntered);
 
     bitly.loadAccessTokenFromStorage((value) => {
       if (value) {
-        bitly.addLink(url, domain,
+        bitly.addLink(url, domainSelected,
           (response) => {
             var data = response.data;
             var message = response.status_txt;
@@ -509,24 +488,14 @@ var styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
   },
-  add_url_box: {
-  },
   list_view: {
     flexDirection: "column",
     backgroundColor: "white",
-  },
-  input_field: {
   },
   edit_page: {
     flex: 1,
     alignItems: "center",
     backgroundColor: "white",
-  },
-  top_buttons: {
-    flexDirection: "row",
-  },
-  add_button: {
-    margin: 5,
   },
 });
 
