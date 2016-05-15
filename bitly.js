@@ -27,42 +27,37 @@ function Bitly() {
 
 methods.loadAccessTokenFromStorage = function (callback) {
   AsyncStorage.getItem(BITLY_ACCESS_TOKEN_KEY)
-    .then((value) => {
-      if (value) {
-        this._accessToken = value;
-        callback(this._accessToken);
-        return;
-      }
-
-      callback(null);
+    .then((token) => {
+      this._accessToken = token;
+      callback(token);
     })
-    .catch(err => {
+    .catch((error) => {
       this._accessToken = value;
-      console.error('Failed to read access token from storage.', err);
+      console.error('Failed to read access token from storage.', error);
+      callback(null);
     });
 };
 
 methods.saveAccessTokenToStorage = function () {
   AsyncStorage.setItem(BITLY_ACCESS_TOKEN_KEY, this._accessToken)
-    .then((error) => {
-      if (error) {
-        console.error("Failed to save access token with: " + error);
-      }
+    .then(() => {
+      console.info('Saved access token to storage.');
     })
-    .catch(err => console.error('Failed to save access token from storage.', err));
+    .catch((error) => {
+      console.error('Failed to save access token from storage.', error)
+    });
 };
 
 methods.clearAccessToken = function (callback) {
   AsyncStorage.setItem(BITLY_ACCESS_TOKEN_KEY, "")
-    .then((error) => {
-      if (error) {
-        console.error("Failed to clear access token with: " + error);
-      } else {
-        this._accessToken = "";
-      }
-      callback(error);
+    .then(() => {
+      callback(null);
     })
-    .catch(err => console.error('Failed to clear access token from storage.', err));
+    .catch((error) => {
+      console.error('Failed to clear access token from storage.', error);
+      this._accessToken = "";
+      callback(error);
+    });
 };
 
 methods.authenticate = function (username, password, callback) {
@@ -132,11 +127,12 @@ methods.getMyLinks = function (params, callback) {
           console.error(linkHistoryPath + " call failed with " + resposne.status_txt);
         } else if (offset === 0) {
           AsyncStorage.setItem(BITLY_LINK_LIST_KEY, response)
-            .then((error) => {
-              if (error) {
-                console.error("Failed to save links with %j", error);
-              }
+            .then(() => {
+              console.info("Saved cache");
             })
+            .catch((error) => {
+              console.error('Failed to retrieve links from server.', error);
+            });
         }
         return response;
       })
@@ -153,7 +149,11 @@ methods.getMyLinks = function (params, callback) {
           getMyLinks({ onlyArchived: onlyArchived, force: true }, callback);
         }
       })
-      .catch(err => console.error('Failed to retrieve links from storage.', err));
+      .catch((error) => {
+        console.error('Failed to retrieve links from storage.', error)
+        getMyLinks({ onlyArchived: onlyArchived, force: true }, callback);
+        callback(null);
+      });
   }
 
   return;
