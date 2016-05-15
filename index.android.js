@@ -28,6 +28,7 @@ var {
 var Utils = require('./utils')
 var Button = require('./button');
 var Login = require('./login');
+var DrawerItem = require('./drawerItem');
 var ReactUtils = require('./react_utils');
 var Bitly = require('./bitly');
 var Share = require('react-native-share');
@@ -167,21 +168,18 @@ var BitlyClient = React.createClass({
 
     var drawerView = (
       <View>
-        <TouchableHighlight
-          style={styles.drawer}
-          onPress={() => this._onShortenClicked(navigator)}>
-          <Text style={styles.drawer_item}>Shorten New Link</Text>
-        </TouchableHighlight>
-        <TouchableHighlight
-          style={styles.drawer}
-          onPress={() => this._onArchivedToggle(navigator)}>
-          <Text style={styles.drawer_item}>{archiveMenu}</Text>
-        </TouchableHighlight>
-        <TouchableHighlight
-          style={styles.drawer}
-          onPress={() => this._onLogoutClicked(navigator)}>
-          <Text style={styles.drawer_item}>Logout</Text>
-        </TouchableHighlight>
+        <DrawerItem
+          onPress={() => this._onShortenClicked(navigator)}
+          iconName="plus"
+          text="Shorten New" />
+        <DrawerItem
+          onPress={() => this._onArchivedToggle(navigator)}
+          iconName="package"
+          text={archiveMenu} />
+        <DrawerItem
+          onPress={() => this._onLogoutClicked(navigator)}
+          iconName="sign-out"
+          text="Logout" />
       </View>
     );
 
@@ -528,13 +526,6 @@ var styles = StyleSheet.create({
   add_button: {
     margin: 5,
   },
-  drawer: {
-    padding: 10,
-    backgroundColor: "#4EA2D8",
-  },
-  drawer_item: {
-    fontSize: 15,
-  }
 });
 
 AppRegistry.registerComponent("BitlyClient", () => BitlyClient);
