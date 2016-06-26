@@ -14,6 +14,7 @@ var {
 } = React;
 
 var Utils = require('./utils')
+var Secrets = require('./secrets');
 
 var BITLY_HOST_URL  = "https://api-ssl.bitly.com";
 var BITLY_API_BASE_URL = BITLY_HOST_URL + "/v3";
@@ -68,8 +69,8 @@ methods.authenticate = function (username, password, callback) {
     password: password,
   };
 
-  var clientId = "YOUR_CLIENT_ID";
-  var clientSecret = "YOUR_CLIENT_SECRET";
+  var clientId = Secrets.ClientId;
+  var clientSecret = Secrets.ClientSecret;
   var base64ClientInfo = Utils.toBase64(clientId + ":" + clientSecret);
 
   var url = BITLY_HOST_URL + "/oauth/access_token";
