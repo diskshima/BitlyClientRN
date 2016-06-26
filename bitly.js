@@ -1,6 +1,6 @@
 /*
  * bitly.js
- * Copyright (C) 2015 diskshima <diskshima@diskshima-MBP.local>
+ * Copyright (C) 2016 diskshima <diskshima@gmail.com>
  *
  * Distributed under terms of the MIT license.
  */
