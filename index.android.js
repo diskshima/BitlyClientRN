@@ -200,7 +200,7 @@ var BitlyClient = React.createClass({
             refreshControl={
               <RefreshControl
                 refreshing={this.state.refreshing}
-                onRefresh={() => this._refreshList(navigator, true)}
+                onRefresh={() => this._refreshList(navigator)}
               />
             }
             renderRow={
@@ -260,6 +260,7 @@ var BitlyClient = React.createClass({
           this.isLoadingMore = false;
           this.setState({
             dataSource: this.state.dataSource.cloneWithRows(this.currentLinks),
+            refreshing: false
           });
         } else {
           var errMsg = "Failed to unarchive with " + response.status_code + ": "
@@ -333,7 +334,7 @@ var BitlyClient = React.createClass({
       bitly.unarchiveLink(link.link, (response) => {
         if (response.status_code === 200) {
           ReactUtils.showToast("Unarchived " + response.data.link_edit.link);
-          this._refreshList(navigator, true);
+          this.renderLoadingView(navigator);
         } else {
           var errMsg = "Failed to unarchive with " + response.status_code + ": "
             + response.status_txt;
@@ -344,7 +345,7 @@ var BitlyClient = React.createClass({
       bitly.archiveLink(link.link, (response) => {
         if (response.status_code === 200) {
           ReactUtils.showToast("Archived " + response.data.link_edit.link);
-          this._refreshList(navigator, true);
+          this.renderLoadingView(navigator);
         } else {
           var errMsg = "Failed to archive with " + response.status_code + ": "
             + response.status_txt;
@@ -354,7 +355,7 @@ var BitlyClient = React.createClass({
     }
     navigator.pop();
   },
-  _refreshList: function (navigator, forceRefresh) {
+  _refreshList: function (navigator) {
     this.setState({
       newUrl: '',
       refreshing: true,
@@ -362,7 +363,7 @@ var BitlyClient = React.createClass({
 
     navigator.replace({
       mode: Mode.List,
-      forceRefresh: forceRefresh
+      forceRefresh: true
     });
   },
   _addButtonPressed: function (navigator, urlEntered, domainSelected) {
@@ -377,7 +378,7 @@ var BitlyClient = React.createClass({
 
             if (response.status_code === 200) {
               ReactUtils.showToast("Added " + data.url);
-              this._refreshList(navigator, true);
+              this.renderLoadingView(navigator);
             } else {
               console.error("Failed with " + response.status_code + ": " + message);
               ReactUtils.showToast("Error: " + message);
