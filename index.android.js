@@ -26,13 +26,13 @@ var {
 } = ReactNative;
 
 var Utils = require('./utils')
-var Button = require('./button');
 var Login = require('./login');
 var DrawerItem = require('./drawerItem');
 var AddView = require('./addView');
 var ReactUtils = require('./react_utils');
 var Bitly = require('./bitly');
-var Share = require('react-native-share');
+
+import Edit from './Edit';
 
 var bitly = new Bitly();
 
@@ -147,7 +147,9 @@ var BitlyClient = React.createClass({
         return this.renderList(navigator);
       case Mode.Edit:
         var link = route.editLink;
-        return this.renderEdit(link, navigator);
+        return (
+          <Edit bitly={bitly} link={link} navigator={navigator} />
+        );
       case Mode.Add:
         return this._renderAdd(navigator);
     }
@@ -270,39 +272,6 @@ var BitlyClient = React.createClass({
       }
     );
   },
-  renderEdit: function (link, navigator) {
-
-    var showLink = this.state.newEditLink || link;
-    var isArchived = showLink.archived;
-    var archiveButtonText = isArchived ? "Unarchive" : "Archive";
-
-    return (
-      <View style={styles.edit_page}>
-        <Text>{showLink.link}</Text>
-        <Text>{showLink.long_url}</Text>
-        <TextInput value={showLink.title}
-          onChangeText={(text) => {
-            this.setState({
-              newEditLink: {
-                link: showLink.link,
-                long_url: showLink.long_url,
-                archived: showLink.archived,
-                title: text,
-              },
-            });
-          }} />
-        <Button
-          onPress={() => this._updateButtonClicked(navigator)}
-          text="Update" />
-        <Button
-          onPress={() => this._onShare(showLink.link, navigator)}
-          text="Share" />
-        <Button
-          onPress={() => this._onArchive(showLink, navigator)}
-          text={archiveButtonText} />
-      </View>
-    );
-  },
   _setDomain: function (domain) {
     this.setState({
       domain: domain
@@ -328,32 +297,6 @@ var BitlyClient = React.createClass({
       mode: Mode.Edit,
       editLink: entry,
     });
-  },
-  _onArchive: function (link, navigator) {
-    if (link.archived) {
-      bitly.unarchiveLink(link.link, (response) => {
-        if (response.status_code === 200) {
-          ReactUtils.showToast("Unarchived " + response.data.link_edit.link);
-          this.renderLoadingView(navigator);
-        } else {
-          var errMsg = "Failed to unarchive with " + response.status_code + ": "
-            + response.status_txt;
-          ReactUtils.showToast(errMsg);
-        }
-      });
-    } else {
-      bitly.archiveLink(link.link, (response) => {
-        if (response.status_code === 200) {
-          ReactUtils.showToast("Archived " + response.data.link_edit.link);
-          this.renderLoadingView(navigator);
-        } else {
-          var errMsg = "Failed to archive with " + response.status_code + ": "
-            + response.status_txt;
-          ReactUtils.showToast(errMsg);
-        }
-      });
-    }
-    navigator.pop();
   },
   _refreshList: function (navigator) {
     this.setState({
@@ -392,35 +335,6 @@ var BitlyClient = React.createClass({
           mode: Mode.Login,
         });
       }
-    });
-  },
-  _updateButtonClicked: function (navigator) {
-    var newEntry = this.state.newEditLink;
-
-    if (!newEntry) {
-      navigator.pop();
-      return;
-    }
-
-    bitly.updateTitle(newEntry.link, newEntry.title, (response) => {
-      var result = response.status_code;
-      if (result === 200) {
-        ReactUtils.showToast("Updated title");
-      } else {
-        var errorMessage = "Failed to update with " + result + ": " +
-          ": " + response.status_txt;
-        ReactUtils.showToast(errorMessage);
-      }
-      navigator.pop();
-    });
-  },
-  _onShare: function (shortLink, navigator) {
-    Share.open({
-      share_text: "",
-      share_URL: shortLink,
-      title: "Share Link",
-    }, function (error) {
-      console.error(error);
     });
   },
   _onLogoutClicked: function (navigator) {
@@ -491,11 +405,6 @@ var styles = StyleSheet.create({
   },
   list_view: {
     flexDirection: "column",
-    backgroundColor: "white",
-  },
-  edit_page: {
-    flex: 1,
-    alignItems: "center",
     backgroundColor: "white",
   },
 });
