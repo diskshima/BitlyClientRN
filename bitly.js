@@ -129,12 +129,13 @@ methods.getMyLinks = function (params, callback) {
         if (response.status_code !== 200) {
           console.error(linkHistoryPath + " call failed with " + resposne.status_txt);
         } else if (offset === 0) {
-          AsyncStorage.setItem(BITLY_LINK_LIST_KEY, response)
+          const dataJson = JSON.stringify(response.data);
+          AsyncStorage.setItem(BITLY_LINK_LIST_KEY, dataJson)
             .then(() => {
               console.info("Saved cache");
             })
             .catch((error) => {
-              console.error('Failed to retrieve links from server.', error);
+              console.warn('Failed to save links to local cache.', error);
             });
         }
         return response;
