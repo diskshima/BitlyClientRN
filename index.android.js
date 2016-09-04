@@ -234,10 +234,7 @@ var BitlyClient = React.createClass({
       refreshing: true,
     });
 
-    navigator.replace({
-      mode: Mode.List,
-      forceRefresh: true
-    });
+    this.fetchData(navigator);
   },
   _addButtonPressed: function (navigator, urlEntered, domainSelected) {
     var url = Utils.addProtocol(urlEntered);
