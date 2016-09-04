@@ -3,7 +3,7 @@
  */
 
 import React, { Component } from 'react';
-import { View, Text, DrawerItem, DrawerLayoutAndroid, ListView,
+import { View, Text, ListView,
   RefreshControl, TouchableHighlight, StyleSheet } from 'react-native';
 
 export default class LinkListView extends Component {

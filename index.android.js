@@ -7,7 +7,6 @@
 
 var React = require('react');
 var ReactNative = require('react-native');
-import Icon from 'react-native-vector-icons/Octicons';
 
 var {
   AppRegistry,
@@ -17,18 +16,16 @@ var {
   ListView,
   Navigator,
   BackAndroid,
-  DrawerLayoutAndroid,
   Linking,
 } = ReactNative;
 
 var Utils = require('./utils')
 var Login = require('./login');
-var DrawerItem = require('./drawerItem');
 var AddView = require('./addView');
 var ReactUtils = require('./react_utils');
 var Bitly = require('./bitly');
 
-import LinkListView from './LinkListView';
+import MainView from './MainView';
 import Edit from './Edit';
 
 var bitly = new Bitly();
@@ -110,7 +107,7 @@ var BitlyClient = React.createClass({
       });
     }
   },
-  render: function() {
+  render: function () {
     return (
       <Navigator
         initialRoute={{mode: this.state.initialMode}}
@@ -143,7 +140,20 @@ var BitlyClient = React.createClass({
             callback={(response) => this._onLoginCallback(response, navigator)} />
         );
       case Mode.List:
-        return this.renderList(navigator);
+        return (
+          <MainView
+            refreshing={this.state.refreshing}
+            showOnlyArchived={this.state.showOnlyArchived}
+            dataSource={this.state.dataSource}
+            onRefresh={() => this._refreshList(navigator)}
+            onPressRow={(entry) => this._openLink(entry)}
+            onLongPressRow={(entry) => this._openEdit(entry, navigator)}
+            onEndReached={() => this._loadMoreRows()}
+            onShortenClicked={() => this._openAdd(navigator)}
+            onArchiveToggle={() => this._onArchiveToggle(navigator)}
+            onLogoutClicked={() => this._logoutSession(navigator)}
+          />
+        );
       case Mode.Edit:
         var link = route.editLink;
         return (
@@ -157,72 +167,17 @@ var BitlyClient = React.createClass({
         );
     }
   },
-  _onShortenClicked: function (navigator) {
+  _openAdd: function (navigator) {
     navigator.replace({
       mode: Mode.Add,
     });
   },
-  _onArchivedToggle: function (navigator) {
+  _onArchiveToggle: function (navigator) {
     this.setState({
       showOnlyArchived: !this.state.showOnlyArchived,
     });
 
     this.renderLoadingView(navigator);
-  },
-  renderList: function (navigator) {
-    var archiveMenu = this.state.showOnlyArchived ? "Show Links" : "Show Archived";
-
-    var drawerView = (
-      <View>
-        <DrawerItem
-          onPress={() => this._onShortenClicked(navigator)}
-          iconName="plus"
-          text="Shorten New" />
-        <DrawerItem
-          onPress={() => this._onArchivedToggle(navigator)}
-          iconName="package"
-          text={archiveMenu} />
-        <DrawerItem
-          onPress={() => this._onLogoutClicked(navigator)}
-          iconName="sign-out"
-          text="Logout" />
-      </View>
-    );
-
-    return (
-      <DrawerLayoutAndroid
-        drawerWidth={200}
-        drawerPosition={DrawerLayoutAndroid.positions.Left}
-        ref={this.setDrawerInstance}
-        renderNavigationView={() => drawerView}>
-        <View style={styles.main}>
-          <View style={styles.topmenu}>
-            <Icon name="three-bars" size={35} color="black" onPress={this._openDrawer} />
-          </View>
-          <LinkListView
-            refreshing={this.state.refreshing}
-            dataSource={this.state.dataSource}
-            onRefresh={() => this._refreshList(navigator)}
-            onPressRow={(entry) => this._openLink(entry)}
-            onLongPressRow={(entry) => this._openEdit(entry, navigator)}
-            onEndReached={() => this._loadMoreRows()}
-          />
-        </View>
-      </DrawerLayoutAndroid>
-    );
-  },
-  drawerInstance: {
-    instance : {
-      openDrawer : function() {
-        console.warn('Default empty implementation.');
-      }
-    }
-  },
-  setDrawerInstance: function (instance) {
-    this.drawerInstance.instance = instance;
-  },
-  _openDrawer: function () {
-    this.drawerInstance.instance.openDrawer();
   },
   _loadMoreRows: function () {
     ReactUtils.showToast("Loading more data...");
@@ -312,7 +267,7 @@ var BitlyClient = React.createClass({
       }
     });
   },
-  _onLogoutClicked: function (navigator) {
+  _logoutSession: function (navigator) {
     bitly.clearAccessToken((error) => {
       if (error) {
         ReactUtils.showToast("Failed to logout");
@@ -323,18 +278,30 @@ var BitlyClient = React.createClass({
       }
     });
   },
+  _getPreviousMode: function (navigator) {
+    const routes = navigator.getCurrentRoutes();
+    const length = routes.length;
+
+    return (length === 1) ? null : routes[length-2].mode;
+  },
+  _wasLoadingScreen: function (navigator) {
+    return this._getPreviousMode(navigator) === Mode.Load;
+  },
   renderLoadingView: function (navigator) {
-    bitly.loadAccessTokenFromStorage((value) => {
-      var name;
-      var mode;
-      if (value) {
-        this.fetchData(navigator);
-      } else {
-        navigator.replace({
-          mode: Mode.Login,
-        });
-      }
-    });
+    if (!this._wasLoadingScreen(navigator)) {
+      bitly.loadAccessTokenFromStorage((value) => {
+        var name;
+        var mode;
+        if (value) {
+          this.fetchData(navigator);
+        } else {
+          navigator.replace({
+            mode: Mode.Login,
+          });
+        }
+      });
+    }
+
     return (
       <View style={styles.loading}>
         <Text>Loading links...</Text>
@@ -347,16 +314,6 @@ var styles = StyleSheet.create({
   loading: {
     flex: 1,
     alignItems: "center",
-  },
-  topmenu: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginLeft: 10,
-    height: 50,
-  },
-  main: {
-    flex: 1,
-    flexDirection: "column",
   },
 });
 
