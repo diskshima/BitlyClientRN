@@ -14,7 +14,7 @@ import Button from './button';
 export default class Edit extends Component {
   constructor(props) {
     super(props);
-    this.state = {title: props.link.title };
+    this.state = {title: props.link.title};
 
     this._bitly = props.bitly;
     this._link = props.link;
@@ -35,7 +35,7 @@ export default class Edit extends Component {
         <Text>{link.link}</Text>
         <Text>{link.long_url}</Text>
         <TextInput value={link.title}
-          style={{width: width * 0.8}}
+          style={{width: width * 0.95}}
           onChangeText={(text) => {
             this.setState({ title: text });
           }} />

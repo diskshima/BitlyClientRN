@@ -15,14 +15,10 @@ var {
   Text,
   View,
   ListView,
-  TouchableHighlight,
-  TextInput,
   Navigator,
   BackAndroid,
   DrawerLayoutAndroid,
   Linking,
-  Picker,
-  RefreshControl,
 } = ReactNative;
 
 var Utils = require('./utils')
@@ -32,6 +28,7 @@ var AddView = require('./addView');
 var ReactUtils = require('./react_utils');
 var Bitly = require('./bitly');
 
+import LinkListView from './LinkListView';
 import Edit from './Edit';
 
 var bitly = new Bitly();
@@ -108,7 +105,9 @@ var BitlyClient = React.createClass({
       ReactUtils.showToast(errMsg);
     } else {
       ReactUtils.showToast("Successfully logged in.");
-      this.fetchData(navigator);
+      navigator.replace({
+        mode: Mode.Load,
+      });
     }
   },
   render: function() {
@@ -151,7 +150,11 @@ var BitlyClient = React.createClass({
           <Edit bitly={bitly} link={link} navigator={navigator} />
         );
       case Mode.Add:
-        return this._renderAdd(navigator);
+        return (
+          <AddView url={this.state.newUrl} domain={this.state.domain}
+            onAddPressed={(url, domain) => this._addButtonPressed(navigator, url, domain)}
+          />
+        );
     }
   },
   _onShortenClicked: function (navigator) {
@@ -196,32 +199,13 @@ var BitlyClient = React.createClass({
           <View style={styles.topmenu}>
             <Icon name="three-bars" size={35} color="black" onPress={this._openDrawer} />
           </View>
-          <ListView
-            style={styles.list_view}
+          <LinkListView
+            refreshing={this.state.refreshing}
             dataSource={this.state.dataSource}
-            refreshControl={
-              <RefreshControl
-                refreshing={this.state.refreshing}
-                onRefresh={() => this._refreshList(navigator)}
-              />
-            }
-            renderRow={
-              (entry: Object, sectionId: number, rowId: number) => {
-                return (
-                  <TouchableHighlight
-                    onPress={() => this._onPressRow(entry)}
-                    onLongPress={() => this._onLongPressRow(entry, navigator)}
-                    style={styles.row}
-                    underlayColor="#AAAAAA">
-                    <View style={styles.rowInside}>
-                      <Text style={styles.title}>{entry.title || entry.long_url}</Text>
-                      <Text style={styles.short_url}>{entry.link}</Text>
-                    </View>
-                  </TouchableHighlight>
-                );
-              }
-            }
-            onEndReached={this._loadMoreRows}
+            onRefresh={() => this._refreshList(navigator)}
+            onPressRow={(entry) => this._openLink(entry)}
+            onLongPressRow={(entry) => this._openEdit(entry, navigator)}
+            onEndReached={() => this._loadMoreRows()}
           />
         </View>
       </DrawerLayoutAndroid>
@@ -277,21 +261,12 @@ var BitlyClient = React.createClass({
       domain: domain
     });
   },
-  _renderAdd: function (navigator) {
-    return (
-      <AddView
-        url={this.state.newUrl}
-        domain={this.state.domain}
-        onAddPressed={(url, domain) => this._addButtonPressed(navigator, url, domain)}
-      />
-    );
-  },
-  _onPressRow: function (entry) {
+  _openLink: function (entry) {
     var url = entry.link;
     Linking.openURL(url)
       .catch(err => console.error('Failed to open URL: ' + url, err));
   },
-  _onLongPressRow: function (entry, navigator) {
+  _openEdit: function (entry, navigator) {
     var url = entry.link;
     navigator.push({
       mode: Mode.Edit,
@@ -379,33 +354,9 @@ var styles = StyleSheet.create({
     marginLeft: 10,
     height: 50,
   },
-  row: {
-    flex: 1,
-    justifyContent: "space-between",
-    backgroundColor: "white",
-    borderBottomWidth: 1,
-    borderBottomColor: "#4EA2D8",
-  },
-  rowInside: {
-    margin: 9,
-  },
-  title: {
-    color: "black",
-    fontSize: 15,
-    marginBottom: 5,
-  },
-  short_url: {
-    color: "#EA4A0E",
-    marginLeft: 5,
-    marginBottom: 5,
-  },
   main: {
     flex: 1,
     flexDirection: "column",
-  },
-  list_view: {
-    flexDirection: "column",
-    backgroundColor: "white",
   },
 });
 
