@@ -34,7 +34,7 @@ export default class Edit extends Component {
       <View style={styles.edit_page}>
         <Text>{link.link}</Text>
         <Text>{link.long_url}</Text>
-        <TextInput value={link.title}
+        <TextInput value={this.state.title}
           style={{width: width * 0.95}}
           onChangeText={(text) => {
             this.setState({ title: text });
@@ -47,7 +47,7 @@ export default class Edit extends Component {
   }
 
   _updateButtonClicked() {
-    bitly.updateTitle(this._link.link, this.state.title, (response) => {
+    this._bitly.updateTitle(this._link.link, this.state.title, (response) => {
       var result = response.status_code;
       if (result === 200) {
         ReactUtils.showToast("Updated title");
@@ -70,7 +70,7 @@ export default class Edit extends Component {
 
   _onArchive(link) {
     if (link.archived) {
-      bitly.unarchiveLink(link.link, (response) => {
+      this._bitly.unarchiveLink(link.link, (response) => {
         if (response.status_code === 200) {
           ReactUtils.showToast("Unarchived " + response.data.link_edit.link);
           this.renderLoadingView(this._navigator);
@@ -81,7 +81,7 @@ export default class Edit extends Component {
         }
       });
     } else {
-      bitly.archiveLink(link.link, (response) => {
+      this._bitly.archiveLink(link.link, (response) => {
         if (response.status_code === 200) {
           ReactUtils.showToast("Archived " + response.data.link_edit.link);
           this.renderLoadingView(this._navigator);
